@@ -4,16 +4,18 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { VIEW } from "../constants/state";
-import SheetView from "./SheetView";
+
+import SheetsView from "./SheetsView";
 import ProfileView from "./ProfileView";
 import NotificationView from "./NotificationView";
 import SettingView from "./SettingView";
 
+import { VIEW } from "../constants/state";
+
 const MainView = () => {
-  const [value, setValue] = useState(VIEW.SHEET);
+  const [value, setValue] = useState(VIEW.SHEETS);
   const components = {
-    [VIEW.SHEET]: <SheetView />,
+    [VIEW.SHEETS]: <SheetsView />,
     [VIEW.PROFILE]: <ProfileView />,
     [VIEW.NOTIFICATION]: <NotificationView />,
     [VIEW.SETTING]: <SettingView />,
@@ -30,7 +32,9 @@ const MainView = () => {
         flexDirection: "column",
       }}
     >
-      <Box flex={1}>{components[value] && components[value]}</Box>
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        {components[value] && components[value]}
+      </Box>
       <BottomNavigation
         showLabels
         value={value}

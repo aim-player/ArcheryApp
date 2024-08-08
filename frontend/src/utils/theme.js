@@ -17,9 +17,16 @@ const theme = createTheme({
           "& input": {
             padding: 0,
           },
+          "& div": {
+            padding: 0,
+          },
         },
       },
     },
+    MuiButtonGroup: {
+      styleOverrides: { root: { minWidth: 0 }, grouped: { minWidth: 0 } },
+    },
+    MuiList: { styleOverrides: { root: { padding: 0 } } },
   },
 });
 export default theme;
