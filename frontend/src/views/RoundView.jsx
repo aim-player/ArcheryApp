@@ -22,8 +22,8 @@ import PieChartIcon from "@mui/icons-material/PieChart";
 import AddIcon from "@mui/icons-material/Add";
 
 import RoundCreate from "components/round/RoundCreate";
-import dayjs from "dayjs";
 import { SCORE_COLOR } from "constants/rule";
+import { requestFetch } from "App";
 
 const ButtonPad = [
   ["X", 10, "M", "ERASE"],
@@ -38,22 +38,45 @@ const RoundView = ({ sheet, round, setRound, close }) => {
   const [openEditor, setOpenEditor] = useState(false);
   const [currentEnd, setCurrentEnd] = useState();
 
+  const generateEndId = () => {
+    let id = 1;
+    if (round.ends && round.ends.length > 0) {
+      round.ends.forEach((r) => {
+        if (r.id >= id) id = r.id + 1;
+      });
+    }
+    return id;
+  };
   const editRound = () => {
     setEditTarget(round);
     setAnchorEl(null);
   };
   const deleteRound = () => {};
   const addEnd = (end) => {
-    // if (roundEnds >= round.endCount) return;
-    // const newEnd = {
-    //   id: dayjs().format("YYYYMMDDHHmmss"),
-    //   data: end,
-    // };
-    // const updatedEnds = [...roundEnds, newEnd];
-    // ends[round.id] = updatedEnds;
-    // sendConsoleLog("======: " + JSON.stringify(ends));
-    // setAppData((state) => ({ ...state, ends }));
-    // setOpenEditor(false);
+    if (!currentEnd && round.ends && round.ends.length >= round.endCount)
+      return;
+    if (currentEnd) {
+      round.ends = round.ends.map((e) => {
+        if (currentEnd.id === e.id) e.data = end;
+        return e;
+      });
+      sheet.rounds = sheet.rounds.map((r) => {
+        if (r.id === round.id) r.ends = round.ends;
+        return r;
+      });
+    } else {
+      const newEnd = {
+        id: generateEndId(),
+        data: end,
+      };
+      round.ends = round.ends ? [...round.ends, newEnd] : [newEnd];
+      sheet.rounds = sheet.rounds.map((r) => {
+        if (r.id === round.id) r.ends = round.ends;
+        return r;
+      });
+    }
+    requestFetch("update_sheet", sheet);
+    setOpenEditor(false);
   };
   const editEnd = (end) => {
     setCurrentEnd(end);
@@ -94,17 +117,205 @@ const RoundView = ({ sheet, round, setRound, close }) => {
           </Button>
         </ButtonGroup>
       </DialogTitle>
-      <Box sx={{ height: "100%" }}>
-        {/* {roundEnds.map((end, index) => (
-          <MenuItem
-            key={`end_${index}`}
-            onClick={() => editEnd(end)}
-            sx={{ border: "1px solid #ccc" }}
-          >
-            {end.id}
-          </MenuItem>
-        ))}
-        {roundEnds.length < round.endCount && (
+      <Box sx={{ border: "1px solid #ccc", height: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1 }}>
+          {round.ends &&
+            round.ends.map((end, endIndex) => (
+              <MenuItem
+                key={`end_${endIndex}`}
+                onClick={() => editEnd(end)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: (round.arrowCount / 3) * 50,
+                  border: "1px solid #ccc",
+                  padding: 0,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 2,
+                    border: "1px solid #ccc",
+                    height: "100%",
+                  }}
+                >
+                  E{end.id}
+                </Box>
+                {end.data && (
+                  <>
+                    <Grid container sx={{ flex: 1, height: "100%" }}>
+                      {end.data.map((score, scoreIndex) => (
+                        <Grid
+                          item
+                          xs={4}
+                          key={`${endIndex}_${scoreIndex}`}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            border: "1px solid #ccc",
+                          }}
+                        >
+                          {score}
+                        </Grid>
+                      ))}
+                    </Grid>
+                    <Grid
+                      container
+                      item
+                      xs={2}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        height: "100%",
+                      }}
+                    >
+                      {Array.from({
+                        length: Math.ceil(end.data.length / 3),
+                      }).map((_, index) => {
+                        const sum = end.data
+                          .slice(index * 3, index * 3 + 3)
+                          .reduce((acc, curr) => {
+                            if (curr === "M") curr = 0;
+                            else if (curr === "X") curr = 10;
+                            return acc + curr;
+                          }, 0);
+
+                        return (
+                          <Grid
+                            item
+                            key={`sum_${index}`}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              flex: 1,
+                              border: "1px solid #ccc",
+                              padding: 1,
+                            }}
+                          >
+                            {sum}
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                    <Grid
+                      container
+                      item
+                      xs={2}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%",
+                        border: "1px solid #ccc",
+                      }}
+                    >
+                      {end.data.reduce((acc, curr) => {
+                        if (curr === "M") curr = 0;
+                        else if (curr === "X") curr = 10;
+                        return acc + curr;
+                      }, 0)}
+                    </Grid>
+                  </>
+                )}
+              </MenuItem>
+            ))}
+          {(!round.ends || round.ends.length < round.endCount) && (
+            <MenuItem
+              onClick={() => {
+                setCurrentEnd(null);
+                setOpenEditor(true);
+              }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                height: (round.arrowCount / 3) * 50,
+                border: "1px solid #ccc",
+                padding: 0,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 2,
+                  border: "1px solid #ccc",
+                  height: "100%",
+                  color: "transparent",
+                }}
+              >
+                E0
+              </Box>
+              <Grid container sx={{ flex: 1, height: "100%" }}>
+                {Array(round.arrowCount)
+                  .fill(null)
+                  .map((score, scoreIndex) => (
+                    <Grid
+                      item
+                      xs={4}
+                      key={`cell_${scoreIndex}`}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        border: "1px solid #ccc",
+                      }}
+                    >
+                      {score}
+                    </Grid>
+                  ))}
+              </Grid>
+              <Grid
+                container
+                item
+                xs={2}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              >
+                {Array.from({
+                  length: Math.ceil(round.arrowCount / 3),
+                }).map((_, index) => {
+                  return (
+                    <Grid
+                      key={`sum_${index}`}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flex: 1,
+                        border: "1px solid #ccc",
+                        padding: 1,
+                      }}
+                    ></Grid>
+                  );
+                })}
+              </Grid>
+              <Grid
+                container
+                item
+                xs={2}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                  border: "1px solid #ccc",
+                }}
+              ></Grid>
+            </MenuItem>
+          )}
+        </Box>
+        {(!round.ends || round.ends.length < round.endCount) && (
           <Button
             variant="contained"
             sx={{
@@ -118,7 +329,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
           >
             <AddIcon />
           </Button>
-        )} */}
+        )}
       </Box>
 
       <Menu

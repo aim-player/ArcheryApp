@@ -3,6 +3,7 @@ import { Box, Button, List, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
+import { requestFetch } from "App";
 
 const RoundCreate = ({ sheet, editTarget, close }) => {
   const [inputs, setInputs] = useState({
@@ -11,17 +12,24 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     endCount: END_COUNT[5],
   });
 
+  const generateRoundId = () => {
+    let id = 1;
+    if (sheet.rounds && sheet.rounds.length > 0) {
+      sheet.rounds.forEach((round) => {
+        if (round.id >= id) id = round.id + 1;
+      });
+    }
+    return id;
+  };
+
   const addRound = () => {
-    // const newRound = {
-    //   id: dayjs().format("YYYYMMDDHHmmss"),
-    //   ...inputs,
-    // };
-    // const rounds = appData.rounds ? appData.rounds: {};
-    // const sheetRounds = rounds[sheet.created_at];
-    // if (sheetRounds) sheetRounds.push(newRound);
-    // else rounds[sheet.created_at] = [newRound];
-    // setAppData((state) => ({ ...state, rounds }));
-    // close();
+    const newRound = {
+      id: generateRoundId(),
+      ...inputs,
+    };
+    const rounds = sheet.rounds ? [...sheet.rounds, newRound] : [newRound];
+    requestFetch("update_sheet", { ...sheet, rounds });
+    close();
   };
   const updateRound = () => {
     // const rounds = appData.rounds ? appData.rounds: {};
@@ -136,7 +144,7 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
           sx={{ p: 1 }}
           onClick={editTarget ? updateRound : addRound}
         >
-          {editTarget ? "수정하기" : "추가하기"}
+          {editTarget ? "수정하기" : "시작하기"}
         </Button>
       </Box>
     </Box>

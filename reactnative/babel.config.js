@@ -10,5 +10,15 @@ module.exports = {
         },
       },
     ],
+    [
+      'module:react-native-dotenv',
+      {
+        moduleName: '@env',
+        path:
+          process.env.NODE_ENV === 'production'
+            ? '.env.production'
+            : '.env.development',
+      },
+    ],
   ],
 };

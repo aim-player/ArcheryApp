@@ -15,19 +15,21 @@ import PieChartIcon from "@mui/icons-material/PieChart";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SheetCreate from "components/sheet/SheetCreate";
 import dayjs from "dayjs";
 import RoundCreate from "components/round/RoundCreate";
 import RoundView from "./RoundView";
 import { requestFetch } from "App";
+import { useSheets } from "utils/context";
 
 const SheetView = ({ sheet, setSheet }) => {
+  const [sheets] = useSheets();
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
   const [round, setRound] = useState();
   const [createRound, setCreateRound] = useState(false);
-  
+
   const editSheet = () => {
     setEditTarget(sheet);
     setAnchorEl(null);
@@ -37,6 +39,13 @@ const SheetView = ({ sheet, setSheet }) => {
     setSheet(null);
     requestFetch("delete_sheet", { id: sheet.id });
   };
+
+  useEffect(() => {
+    if (sheet && sheet.rounds && round) {
+      const exists = sheet.rounds.find((r) => r.id === round.id);
+      if (exists) setRound(exists);
+    }
+  }, [sheets]);
 
   return (
     <Box

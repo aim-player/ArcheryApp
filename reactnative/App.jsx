@@ -2,7 +2,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
-import {createSheet, deleteSheets} from '@/src/sheetManager';
+import {createSheet, deleteSheets, updateSheet} from '@/src/sheetManager';
+import {URL} from '@env';
 
 const sheetIdsFilePath = `${RNFS.DocumentDirectoryPath}/sheet_ids.json`;
 const placesFilePath = `${RNFS.DocumentDirectoryPath}/places.json`;
@@ -92,7 +93,6 @@ const App = () => {
       await createSheet(webviewRef.current.postMessage, sheet, callbackFn);
     } else if (message.type === 'update_sheet') {
       await updateSheet(message.payload, loadData);
-      sendAlert('시트 정보를 수정했어요.');
     } else if (message.type === 'delete_sheet') {
       const payload = message.payload;
       setSheetIds(state => state.filter(id => id !== payload.id));
@@ -154,7 +154,7 @@ const App = () => {
       <WebView
         ref={webviewRef}
         style={styles.webview}
-        source={{uri: 'http://localhost:3000'}}
+        source={{uri: URL}}
         onMessage={handleMessage}
       />
     </SafeAreaView>

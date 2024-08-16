@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Dialog, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -10,6 +10,10 @@ const SheetsView = () => {
   const [sheets] = useSheets();
   const [open, setOpen] = useState(false);
   const [sheet, setSheet] = useState();
+
+  useEffect(() => {
+    if (sheet) setSheet(sheets.find((s) => s.id === sheet.id));
+  }, [sheets]);
 
   return (
     <Box

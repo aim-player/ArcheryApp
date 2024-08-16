@@ -29,7 +29,12 @@ export const deleteSheets = async (ids = [], callbackFn) => {
   }
 };
 export const updateSheet = async (sheet, callbackFn) => {
-  const filePath = `${RNFS.DocumentDirectoryPath}/sheet_${sheet.id}.json`;
-  await RNFS.writeFile(filePath, JSON.stringify(sheet), 'utf8');
-  await callbackFn();
+  try {
+    const filePath = `${RNFS.DocumentDirectoryPath}/sheet_${sheet.id}.json`;
+    await RNFS.writeFile(filePath, JSON.stringify(sheet), 'utf8');
+    await callbackFn();
+    console.log('시트 업데이트 성공 ', JSON.stringify(sheet));
+  } catch (err) {
+    console.error('시트 업데이트 실패: ', err);
+  }
 };
