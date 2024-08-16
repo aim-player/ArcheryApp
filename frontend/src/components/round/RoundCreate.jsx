@@ -1,34 +1,45 @@
 import { Box, Button, List, MenuItem, Select, Typography } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
-import dayjs from "dayjs";
 
-const RoundCreate = ({ sheet, editTarget, close, loadRounds }) => {
+const RoundCreate = ({ sheet, editTarget, close }) => {
   const [inputs, setInputs] = useState({
     distance: DISTANCE[3],
     arrowCount: ARROW_COUNT[1],
-    endCount: END_COUNT[2],
+    endCount: END_COUNT[5],
   });
+
   const addRound = () => {
-    const newRound = {
-      id: dayjs().format("YYYYMMDDHHmmss"),
-      ...inputs,
-    };
-    const savedRounds = localStorage.getItem("rounds")
-      ? JSON.parse(localStorage.getItem("rounds"))
-      : {};
-
-    const sheetRounds = savedRounds[sheet.created_at];
-    if (sheetRounds) sheetRounds.push(newRound);
-    else savedRounds[sheet.created_at] = [newRound];
-
-    localStorage.setItem("rounds", JSON.stringify(savedRounds));
-    close();
-    loadRounds();
+    // const newRound = {
+    //   id: dayjs().format("YYYYMMDDHHmmss"),
+    //   ...inputs,
+    // };
+    // const rounds = appData.rounds ? appData.rounds: {};
+    // const sheetRounds = rounds[sheet.created_at];
+    // if (sheetRounds) sheetRounds.push(newRound);
+    // else rounds[sheet.created_at] = [newRound];
+    // setAppData((state) => ({ ...state, rounds }));
+    // close();
   };
-  const updateRound = () => {};
+  const updateRound = () => {
+    // const rounds = appData.rounds ? appData.rounds: {};
+    // const sheetRounds = rounds[sheet.created_at];
+    // if (sheetRounds)
+    //   rounds[sheet.created_at] = rounds[sheet.created_at].map((s) => {
+    //     if (s.id === editTarget.id) return { id: s.id, ...inputs };
+    //     else return s;
+    //   });
+    // else rounds[sheet.created_at] = [];
+    // setAppData((state) => ({ ...state, rounds }));
+    // close();
+  };
+  const applyEditTarget = () => setInputs(editTarget);
+
+  useEffect(() => {
+    if (editTarget) applyEditTarget();
+  }, []);
   return (
     <Box
       sx={{

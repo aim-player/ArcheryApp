@@ -1,24 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box, Button, Dialog, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import SheetCreate from "components/sheet/SheetCreate";
 import SheetView from "./SheetView";
+import { useSheets } from "utils/context";
 
 const SheetsView = () => {
+  const [sheets] = useSheets();
   const [open, setOpen] = useState(false);
-  const [sheets, setSheets] = useState([]);
   const [sheet, setSheet] = useState();
 
-  const loadSheets = () => {
-    const savedSheets = localStorage.getItem("sheets");
-    if (savedSheets) setSheets(JSON.parse(savedSheets));
-    else setSheets([]);
-  };
-  
-  useEffect(() => {
-    loadSheets();
-  }, []);
   return (
     <Box
       sx={{
@@ -74,19 +66,17 @@ const SheetsView = () => {
             alignItems: "center",
           }}
         >
-          <Button variant="contained" sx={{ mr: 0.5 }}>
+          <Button
+            variant="contained"
+            sx={{ mr: 0.5 }}
+            onClick={() => setOpen(true)}
+          >
             <AddIcon />
           </Button>
           버튼을 눌러 시트를 추가해보세요!
         </Box>
       )}
-      {open && (
-        <SheetCreate
-          close={() => setOpen(false)}
-          loadSheets={loadSheets}
-          setSheet={setSheet}
-        />
-      )}
+      {open && <SheetCreate close={() => setOpen(false)} setSheet={setSheet} />}
       <Dialog
         open={!!sheet}
         sx={{
@@ -99,13 +89,7 @@ const SheetsView = () => {
         }}
         onClose={() => setSheet(null)}
       >
-        {sheet && (
-          <SheetView
-            sheet={sheet}
-            setSheet={setSheet}
-            loadSheets={loadSheets}
-          />
-        )}
+        {sheet && <SheetView sheet={sheet} setSheet={setSheet} />}
       </Dialog>
     </Box>
   );

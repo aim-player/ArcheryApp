@@ -15,63 +15,28 @@ import PieChartIcon from "@mui/icons-material/PieChart";
 import CallMadeIcon from "@mui/icons-material/CallMade";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SheetCreate from "components/sheet/SheetCreate";
 import dayjs from "dayjs";
 import RoundCreate from "components/round/RoundCreate";
 import RoundView from "./RoundView";
+import { requestFetch } from "App";
 
-const SheetView = ({ sheet, setSheet, loadSheets }) => {
+const SheetView = ({ sheet, setSheet }) => {
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
-  const [rounds, setRounds] = useState([]);
   const [round, setRound] = useState();
   const [createRound, setCreateRound] = useState(false);
+  
   const editSheet = () => {
     setEditTarget(sheet);
     setAnchorEl(null);
   };
   const deleteSheet = () => {
     if (!window.confirm("이 시트를 삭제할까요?")) return;
-    const savedSheets = localStorage.getItem("sheets")
-      ? JSON.parse(localStorage.getItem("sheets"))
-      : [];
-    const restSheets = savedSheets.filter(
-      (d) => d.created_at !== sheet.created_at
-    );
-    localStorage.setItem("sheets", restSheets);
     setSheet(null);
-    loadSheets();
+    requestFetch("delete_sheet", { id: sheet.id });
   };
-
-  const loadRounds = () => {
-    const savedRounds = localStorage.getItem("rounds")
-      ? JSON.parse(localStorage.getItem("rounds"))
-      : null;
-    if (!savedRounds) return;
-
-    const sheetRounds = savedRounds[sheet.created_at];
-    if (!sheetRounds) return;
-    setRounds(sheetRounds);
-  };
-
-  useEffect(() => {
-    loadRounds();
-  }, []);
-
-  useEffect(() => {
-    const getRoundsData = () => {
-      const roundsData = {};
-      const savedRoundsData = localStorage.getItem("roundsData")
-        ? JSON.parse(localStorage.getItem("roundsData"))
-        : {};
-      rounds.forEach((r) => {
-        if (savedRoundsData[r.created_at])
-          roundsData[r.created_at] = savedRoundsData[r.created_at];
-      });
-    };
-    if (rounds.length > 0) getRoundsData();
-  }, [rounds]);
 
   return (
     <Box
@@ -131,9 +96,9 @@ const SheetView = ({ sheet, setSheet, loadSheets }) => {
         </Box>
       </Box>
       <Divider />
-      {rounds.length > 0 ? (
+      {sheet.rounds && sheet.rounds.length > 0 ? (
         <Box sx={{ flex: 1 }}>
-          {rounds.map((r, index) => (
+          {sheet.rounds.map((r, index) => (
             <MenuItem
               onClick={() => setRound(r)}
               key={`round_${index}`}
@@ -195,17 +160,19 @@ const SheetView = ({ sheet, setSheet, loadSheets }) => {
           close={() => setEditTarget(null)}
           setSheet={setSheet}
           editTarget={editTarget}
-          loadSheets={loadSheets}
         />
       )}
       {createRound && (
-        <RoundCreate
+        <RoundCreate sheet={sheet} close={() => setCreateRound(false)} />
+      )}
+      {round && (
+        <RoundView
           sheet={sheet}
-          close={() => setCreateRound(false)}
-          loadRounds={loadRounds}
+          round={round}
+          setRound={setRound}
+          close={() => setRound(null)}
         />
       )}
-      {round && <RoundView round={round} close={() => setRound(null)} />}
     </Box>
   );
 };

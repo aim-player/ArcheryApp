@@ -20,10 +20,13 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { requestFetch } from "App";
+import { usePlaces, useSheets } from "utils/context";
 
-const SheetCreate = ({ close, loadSheets, editTarget, setSheet }) => {
+const SheetCreate = ({ close, editTarget, setSheet }) => {
+  const [sheets] = useSheets();
+  const [places] = usePlaces();
   const [popup, setPopup] = useState({ places: false, addPlace: false });
-  const [places, setPlaces] = useState([]);
   const [place, setPlace] = useState("");
   const [inputs, setInputs] = useState({
     name: "",
@@ -33,27 +36,17 @@ const SheetCreate = ({ close, loadSheets, editTarget, setSheet }) => {
     endTime: dayjs(),
   });
 
-  const loadPlaces = () => {
-    const savedPlaces = localStorage.getItem("places");
-    if (savedPlaces) setPlaces(JSON.parse(savedPlaces));
-  };
-
   const addPlace = () => {
     const isDuplicated = places.find((p) => p === place);
     if (isDuplicated) return alert("이미 추가된 장소입니다.");
-
-    localStorage.setItem("places", JSON.stringify([...places, place]));
-    setPlaces((state) => [...state, place]);
+    requestFetch("update_places", [...places, place]);
     setPlace("");
-    setPopup((state) => ({ ...state, places: true, addPlace: false }));
   };
 
   const deletePlace = (place) => {
     if (window.confirm("이 장소를 삭제할까요?")) {
       const restPlaces = places.filter((p) => p !== place);
-      localStorage.setItem("places", JSON.stringify(restPlaces));
-
-      setPlaces(restPlaces);
+      requestFetch("update_places", restPlaces);
     }
   };
 
@@ -69,61 +62,56 @@ const SheetCreate = ({ close, loadSheets, editTarget, setSheet }) => {
     setPlace(e.target.value);
   };
 
+  const generateSheetId = () => {
+    let id = 1;
+    sheets.forEach((sheet) => {
+      if (sheet.id >= id) id = sheet.id + 1;
+    });
+    return id;
+  };
   const addSheet = () => {
-    const savedSheets = localStorage.getItem("sheets")
-      ? JSON.parse(localStorage.getItem("sheets"))
-      : [];
+    const id = generateSheetId();
     const newSheet = {
+      id,
       ...inputs,
       startTime: inputs.startTime.format("HH:mm"),
       endTime: inputs.endTime.format("HH:mm"),
       date: inputs.date.format("YYYY/MM/DD"),
       created_at: dayjs().format("YYYYMMDDHHmmss"),
     };
-    savedSheets.push(newSheet);
-    localStorage.setItem("sheets", JSON.stringify(savedSheets));
     setSheet(newSheet);
-    loadSheets();
+    requestFetch("add_sheet", newSheet);
     close();
   };
   const updateSheet = () => {
-    const savedSheets = localStorage.getItem("sheets")
-      ? JSON.parse(localStorage.getItem("sheets"))
-      : [];
-    const updatedSheets = savedSheets.map((d) => {
-      if (d.created_at === editTarget.created_at) {
-        const updatedSheet = {
-          ...inputs,
-          startTime: inputs.startTime.format("HH:mm"),
-          endTime: inputs.endTime.format("HH:mm"),
-          date: inputs.date.format("YYYY/MM/DD"),
-          created_at: dayjs().format("YYYYMMDDHHmmss"),
-        };
-        setSheet(updatedSheet);
-        return updatedSheet;
-      } else return d;
-    });
-    localStorage.setItem("sheets", JSON.stringify(updatedSheets));
-    loadSheets();
+    const updatedSheet = {
+      id: editTarget.id,
+      ...inputs,
+      startTime: inputs.startTime.format("HH:mm"),
+      endTime: inputs.endTime.format("HH:mm"),
+      date: inputs.date.format("YYYY/MM/DD"),
+      created_at: dayjs().format("YYYYMMDDHHmmss"),
+    };
+    setSheet(updatedSheet);
+    requestFetch("update_sheet", updatedSheet);
     close();
   };
 
-  useEffect(() => {
-    const applyEditTarget = () => {
-      const { name, place, date, startTime, endTime } = editTarget;
-      setInputs((state) => ({
-        ...state,
-        name,
-        place,
-        date: dayjs(date),
-        startTime: dayjs(`${date}${startTime}`),
-        endTime: dayjs(`${date}${endTime}`),
-      }));
-    };
+  const applyEditTarget = () => {
+    const { name, place, date, startTime, endTime } = editTarget;
+    setInputs((state) => ({
+      ...state,
+      name,
+      place,
+      date: dayjs(date),
+      startTime: dayjs(`${date}${startTime}`),
+      endTime: dayjs(`${date}${endTime}`),
+    }));
+  };
 
-    loadPlaces();
+  useEffect(() => {
     if (editTarget) applyEditTarget();
-  }, [editTarget]);
+  }, []);
 
   return (
     <Box
@@ -279,7 +267,13 @@ const SheetCreate = ({ close, loadSheets, editTarget, setSheet }) => {
                   }}
                 >
                   <span>{place}</span>
-                  <ButtonGroup sx={{ display: "flex", gap: 1 }}>
+                  <ButtonGroup
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      "& .MuiButton-root": { borderRadius: 1 },
+                    }}
+                  >
                     <Button
                       variant="contained"
                       onClick={() => {
