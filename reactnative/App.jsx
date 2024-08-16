@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
+import {createSheet, deleteSheets} from '@/src/sheetManager';
 
 const sheetIdsFilePath = `${RNFS.DocumentDirectoryPath}/sheet_ids.json`;
 const placesFilePath = `${RNFS.DocumentDirectoryPath}/places.json`;
@@ -83,37 +84,19 @@ const App = () => {
     webviewRef.current.postMessage(JSON.stringify(message));
   };
 
-  const deleteSheets = async (ids = []) => {
-    try {
-      ids.forEach(async id => {
-        const filePath = `${RNFS.DocumentDirectoryPath}/sheet_${id}.json`;
-        const fileExists = await RNFS.exists(filePath);
-        if (fileExists) await RNFS.unlink(filePath);
-      });
-      console.log('시트 삭제 성공: ', ids);
-      loadData();
-    } catch (err) {
-      console.error('시트 삭제 실패: ', err);
-    }
-  };
-
   const handleMessage = async event => {
     const message = JSON.parse(event.nativeEvent.data);
     if (message.type === 'add_sheet') {
       const sheet = message.payload;
       setSheetIds(state => [...state, sheet.id]);
-      await createSheet(sheet);
-      await loadData();
+      await createSheet(webviewRef.current.postMessage, sheet, callbackFn);
     } else if (message.type === 'update_sheet') {
-      const sheet = message.payload;
-      const filePath = `${RNFS.DocumentDirectoryPath}/sheet_${sheet.id}.json`;
-      await RNFS.writeFile(filePath, JSON.stringify(sheet), 'utf8');
+      await updateSheet(message.payload, loadData);
       sendAlert('시트 정보를 수정했어요.');
-      await loadData();
     } else if (message.type === 'delete_sheet') {
       const payload = message.payload;
       setSheetIds(state => state.filter(id => id !== payload.id));
-      deleteSheets([payload.id]);
+      deleteSheets([payload.id], loadData);
     } else if (message.type === 'update_places') {
       const payload = message.payload;
       setPlaces(payload);
@@ -129,26 +112,10 @@ const App = () => {
       // webviewRef.current.injectJavaScript(`
       //     window.onDataLoaded(${JSON.stringify(message)})`);
     } else if (message.type === 'reset') {
-      deleteSheets(sheetIds);
+      deleteSheets(sheetIds, loadData);
       setSheetIds([]);
     } else if (message.type === 'log') {
       console.log('LOG ===== ' + JSON.stringify(message.data));
-    }
-  };
-
-  const createSheet = async sheet => {
-    try {
-      const message = {
-        type: 'add_sheet',
-        payload: sheet,
-      };
-      const filePath = `${RNFS.DocumentDirectoryPath}/sheet_${sheet.id}.json`;
-      await RNFS.writeFile(filePath, JSON.stringify(sheet), 'utf8');
-
-      webviewRef.current.postMessage(JSON.stringify(message));
-      console.log('시트 파일 생성 성공: ', filePath);
-    } catch (err) {
-      console.error('시트 파일 생성 실패: ', err);
     }
   };
 
