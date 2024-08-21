@@ -18,7 +18,8 @@ import {
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import PieChartIcon from "@mui/icons-material/PieChart";
+// import PieChartIcon from "@mui/icons-material/PieChart";
+import TimelineIcon from "@mui/icons-material/Timeline";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import BackspaceIcon from "@mui/icons-material/Backspace";
@@ -26,6 +27,7 @@ import BackspaceIcon from "@mui/icons-material/Backspace";
 import RoundCreate from "components/round/RoundCreate";
 import { SCORE_COLOR } from "constants/rule";
 import { requestFetch } from "App";
+import RoundStats from "components/round/RoundStats";
 
 const ButtonPad = [
   ["X", 10, "M", "ERASE"],
@@ -37,8 +39,10 @@ const ButtonPad = [
 const RoundView = ({ sheet, round, setRound, close }) => {
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
-  const [openEditor, setOpenEditor] = useState(false);
   const [currentEnd, setCurrentEnd] = useState();
+
+  const [openEditor, setOpenEditor] = useState(false);
+  const [openStats, setOpenStats] = useState(false);
 
   const generateEndId = () => {
     let id = 1;
@@ -109,8 +113,8 @@ const RoundView = ({ sheet, round, setRound, close }) => {
         <ButtonGroup
           sx={{ gap: 1, "& .MuiButton-root": { p: 1, borderRadius: 1 } }}
         >
-          <Button variant="contained">
-            <PieChartIcon />
+          <Button variant="contained" onClick={() => setOpenStats(true)}>
+            <TimelineIcon />
           </Button>
           <Button
             variant="contained"
@@ -370,6 +374,9 @@ const RoundView = ({ sheet, round, setRound, close }) => {
         fullWidth
       >
         <ScoreEditor round={round} end={currentEnd} addEnd={addEnd} />
+      </Dialog>
+      <Dialog open={openStats} onClose={() => setOpenStats(false)} fullScreen>
+        <RoundStats round={round} close={() => setOpenStats(false)} />
       </Dialog>
     </Box>
   );
