@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, Platform} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
 import {createSheet, deleteSheets, updateSheet} from '@/src/sheetManager';
@@ -90,7 +90,7 @@ const App = () => {
     if (message.type === 'add_sheet') {
       const sheet = message.payload;
       setSheetIds(state => [...state, sheet.id]);
-      await createSheet(webviewRef.current.postMessage, sheet, callbackFn);
+      await createSheet(webviewRef.current.postMessage, sheet, loadData);
     } else if (message.type === 'update_sheet') {
       await updateSheet(message.payload, loadData);
     } else if (message.type === 'delete_sheet') {
@@ -156,6 +156,7 @@ const App = () => {
         style={styles.webview}
         source={{uri: URL}}
         onMessage={handleMessage}
+        injectedJavaScript={`window.platformOS = '${Platform.OS}'`}
       />
     </SafeAreaView>
   );

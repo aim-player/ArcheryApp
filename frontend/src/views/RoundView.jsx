@@ -20,6 +20,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import AddIcon from "@mui/icons-material/Add";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import BackspaceIcon from "@mui/icons-material/Backspace";
 
 import RoundCreate from "components/round/RoundCreate";
 import { SCORE_COLOR } from "constants/rule";
@@ -27,9 +29,9 @@ import { requestFetch } from "App";
 
 const ButtonPad = [
   ["X", 10, "M", "ERASE"],
-  [7, 8, 9, "SAVE"],
-  [4, 5, 6],
-  [1, 2, 3],
+  [9, 8, 7, "SAVE"],
+  [6, 5, 4],
+  [3, 2, 1],
 ];
 
 const RoundView = ({ sheet, round, setRound, close }) => {
@@ -76,6 +78,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
       });
     }
     requestFetch("update_sheet", sheet);
+    setCurrentEnd(null);
     setOpenEditor(false);
   };
   const editEnd = (end) => {
@@ -146,7 +149,10 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 </Box>
                 {end.data && (
                   <>
-                    <Grid container sx={{ flex: 1, height: "100%" }}>
+                    <Grid
+                      container
+                      sx={{ flex: 1, display: "flex", height: "100%" }}
+                    >
                       {end.data.map((score, scoreIndex) => (
                         <Grid
                           item
@@ -157,9 +163,10 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                             justifyContent: "center",
                             alignItems: "center",
                             border: "1px solid #ccc",
+                            color: score ? "#000" : "transparent",
                           }}
                         >
-                          {score}
+                          {score ? score : 0}
                         </Grid>
                       ))}
                     </Grid>
@@ -195,7 +202,6 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                               alignItems: "center",
                               flex: 1,
                               border: "1px solid #ccc",
-                              padding: 1,
                             }}
                           >
                             {sum}
@@ -352,7 +358,17 @@ const RoundView = ({ sheet, round, setRound, close }) => {
           editTarget={editTarget}
         />
       )}
-      <Dialog open={openEditor} onClose={() => setOpenEditor(false)} fullWidth>
+      <Dialog
+        open={openEditor}
+        onClose={() => {
+          setOpenEditor(false);
+          setCurrentEnd(null);
+        }}
+        sx={{
+          "& .MuiPaper-root": { mt: "auto" },
+        }}
+        fullWidth
+      >
         <ScoreEditor round={round} end={currentEnd} addEnd={addEnd} />
       </Dialog>
     </Box>
@@ -368,6 +384,11 @@ const ScoreEditor = ({ round, end, addEnd }) => {
     setScores(end.data);
   };
   const writeScore = (button) => {
+    const convertScore = (score) => {
+      if (score === "X") return 11;
+      if (score === "M") return 0;
+      return score;
+    };
     let hasEmpty;
     switch (button) {
       case "X":
@@ -378,6 +399,7 @@ const ScoreEditor = ({ round, end, addEnd }) => {
             setScores((state) => {
               const temp = [...state];
               temp[lastScoreIndex] = "X";
+              temp.sort((a, b) => convertScore(b) - convertScore(a));
               return temp;
             });
           }
@@ -391,6 +413,7 @@ const ScoreEditor = ({ round, end, addEnd }) => {
             setScores((state) => {
               const temp = [...state];
               temp[lastScoreIndex] = "M";
+              temp.sort((a, b) => convertScore(b) - convertScore(a));
               return temp;
             });
           }
@@ -417,6 +440,7 @@ const ScoreEditor = ({ round, end, addEnd }) => {
             setScores((state) => {
               const temp = [...state];
               temp[lastScoreIndex] = button;
+              temp.sort((a, b) => convertScore(b) - convertScore(a));
               return temp;
             });
           }
@@ -464,7 +488,7 @@ const ScoreEditor = ({ round, end, addEnd }) => {
                       width: "25%",
                       textAlign: "center",
                       p: 0,
-                      height: 40,
+                      height: 60,
                     }}
                     key={`cell_${cellIndex}`}
                     rowSpan={cell === "SAVE" ? 3 : 1}
@@ -484,7 +508,13 @@ const ScoreEditor = ({ round, end, addEnd }) => {
                         },
                       }}
                     >
-                      {cell}
+                      {cell === "SAVE" ? (
+                        <KeyboardReturnIcon />
+                      ) : cell === "ERASE" ? (
+                        <BackspaceIcon />
+                      ) : (
+                        cell
+                      )}
                     </Button>
                   </TableCell>
                 ))}

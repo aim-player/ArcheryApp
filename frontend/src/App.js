@@ -19,24 +19,26 @@ function App() {
   const [, setSheets] = useSheets();
   const [, setPlaces] = usePlaces();
   const onMessage = ({ data }) => {
-    if (!data) return;
-
-    const { type, payload } = JSON.parse(data);
-    if (!type || !messageTypes.includes(type)) return;
-
-    switch (type) {
-      case "load":
-        initialized.current = true;
-        payload.sheets && setSheets(payload.sheets);
-        payload.places && setPlaces(payload.places);
-        break;
-      case "add_sheet":
-        setSheets((state) => [...state, payload]);
-        break;
-      case "alert":
-        window.alert(payload.message);
-        break;
-      default:
+    try {
+      if (!data) return;
+      const { type, payload } = JSON.parse(data);
+      if (!type || !messageTypes.includes(type)) return;
+      switch (type) {
+        case "load":
+          initialized.current = true;
+          payload.sheets && setSheets(payload.sheets);
+          payload.places && setPlaces(payload.places);
+          break;
+        case "add_sheet":
+          setSheets((state) => [...state, payload]);
+          break;
+        case "alert":
+          window.alert(payload.message);
+          break;
+        default:
+      }
+    } catch (err) {
+      sendConsoleLog("err: " + err);
     }
   };
   useEffect(() => {
@@ -45,12 +47,15 @@ function App() {
       if (window.ReactNativeWebView)
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: "load" }));
     };
-
     loadAppData();
 
-    document.addEventListener("message", onMessage);
+    if (window.platformOS === "ios")
+      window.addEventListener("message", onMessage);
+    else document.addEventListener("message", onMessage);
     return () => {
-      document.removeEventListener("message", onMessage);
+      if (window.platformOS === "ios")
+        window.removeEventListener("message", onMessage);
+      else document.removeEventListener("message", onMessage);
     };
   }, []);
 
