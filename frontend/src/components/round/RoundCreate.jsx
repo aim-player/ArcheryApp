@@ -3,9 +3,14 @@ import { Box, Button, List, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
-import { requestFetch } from "App";
+import { requestFetch, useDataLoader } from "App";
+import { requestPost } from "utils/fetch";
+import { URL } from "constants/url";
+import { useEnds, useRounds } from "utils/context";
 
 const RoundCreate = ({ sheet, editTarget, close }) => {
+  const loadData = useDataLoader();
+  const [ends] = useEnds();
   const [inputs, setInputs] = useState({
     distance: DISTANCE[3],
     arrowCount: ARROW_COUNT[1],
@@ -22,16 +27,74 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     return id;
   };
 
-  const addRound = () => {
-    const newRound = {
-      id: generateRoundId(),
+  const addRound = async () => {
+    const payload = {
+      sheet_id: sheet.id,
       ...inputs,
     };
-    const rounds = sheet.rounds ? [...sheet.rounds, newRound] : [newRound];
-    requestFetch("update_sheet", { ...sheet, rounds });
-    close();
+    const requestOptions = {
+      data: payload,
+    };
+    const response = await requestPost(URL.ADD_ROUND, requestOptions);
+    if (response.status === 200) {
+      loadData();
+      close();
+    }
+    // const newRound = {
+    //   id: generateRoundId(),
+    //   ...inputs,
+    // };
+    // const rounds = sheet.rounds ? [...sheet.rounds, newRound] : [newRound];
+    // requestFetch("update_sheet", { ...sheet, rounds });
+    // close();
   };
-  const updateRound = () => {
+  const updateEnds = async () => {
+    const targetEnds = [...ends.filter((e) => e.round_id === editTarget.id)];
+    if (targetEnds.length === 0) return;
+
+    const updatedEnds =
+      editTarget.arrow_count > inputs.arrowCount
+        ? targetEnds.map((end) => {
+            end.scores = JSON.stringify(
+              JSON.parse(end.scores).splice(0, inputs.arrowCount)
+            );
+
+            return end;
+          })
+        : targetEnds.map((end) => {
+            end.scores = JSON.stringify([
+              ...JSON.parse(end.scores),
+              ...Array(inputs.arrowCount - editTarget.arrow_count).fill(null),
+            ]);
+            return end;
+          });
+
+    const requestOptions = {
+      data: {
+        endCount: inputs.endCount,
+        ends: updatedEnds,
+      },
+    };
+    const response = await requestPost(URL.UPDATE_END_ALL, requestOptions);
+    if (response.status === 200) {
+      loadData();
+    }
+  };
+  const updateRound = async () => {
+    const payload = {
+      round_id: editTarget.id,
+      ...inputs,
+    };
+    const requestOptions = {
+      data: payload,
+    };
+    const response = await requestPost(URL.UPDATE_ROUND, requestOptions);
+    await updateEnds();
+
+    if (response.status === 200) {
+      loadData();
+      close();
+    }
     // const rounds = appData.rounds ? appData.rounds: {};
     // const sheetRounds = rounds[sheet.created_at];
     // if (sheetRounds)
@@ -43,8 +106,12 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     // setAppData((state) => ({ ...state, rounds }));
     // close();
   };
-  const applyEditTarget = () => setInputs(editTarget);
-
+  const applyEditTarget = () =>
+    setInputs({
+      ...editTarget,
+      arrowCount: editTarget.arrow_count,
+      endCount: editTarget.end_count,
+    });
   useEffect(() => {
     if (editTarget) applyEditTarget();
   }, []);

@@ -3,8 +3,10 @@ import {SafeAreaView, StyleSheet, Platform} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
 import {createSheet, deleteSheets, updateSheet} from '@/src/sheetManager';
+import LoginView from '@/src/LoginView.jsx';
 import {URL} from '@env';
 
+const directoryPath = `${RNFS.DocumentDirectoryPath}`;
 const sheetIdsFilePath = `${RNFS.DocumentDirectoryPath}/sheet_ids.json`;
 const placesFilePath = `${RNFS.DocumentDirectoryPath}/places.json`;
 
@@ -13,6 +15,7 @@ const App = () => {
   const initialized = useRef(false);
   const [sheetIds, setSheetIds] = useState([]);
   const [places, setPlaces] = useState([]);
+  const [openLogin, setOpenLogin] = useState(false);
 
   const sendAlert = message => {
     webviewRef.current.postMessage(
@@ -20,9 +23,15 @@ const App = () => {
     );
   };
 
+  const sendMessage = (type, payload = {}) => {
+    webviewRef.current.postMessage(JSON.stringify({type, payload: payload}));
+  };
+
   const initialize = async () => {
     let fileExists;
     try {
+      const dirExists = await RNFS.exists(directoryPath);
+      if (!dirExists) await RNFS.mkdir(directoryPath);
       fileExists = await RNFS.exists(sheetIdsFilePath);
       if (!fileExists) {
         await RNFS.writeFile(sheetIdsFilePath, JSON.stringify([]), 'utf8');
@@ -33,6 +42,7 @@ const App = () => {
         console.log('ids 파일이 존재합니다 ', fileData);
       }
       fileExists = await RNFS.exists(placesFilePath);
+      console.log('sheets place file: ', fileExists);
       if (!fileExists)
         await RNFS.writeFile(placesFilePath, JSON.stringify([]), 'utf8');
       else {
@@ -116,6 +126,8 @@ const App = () => {
       setSheetIds([]);
     } else if (message.type === 'log') {
       console.log('LOG ===== ' + JSON.stringify(message.data));
+    } else if (message.type === 'login') {
+      setOpenLogin(true);
     }
   };
 
@@ -150,15 +162,25 @@ const App = () => {
     savePlaces();
   }, [places]);
   return (
-    <SafeAreaView style={styles.container}>
-      <WebView
-        ref={webviewRef}
-        style={styles.webview}
-        source={{uri: URL}}
-        onMessage={handleMessage}
-        injectedJavaScript={`window.platformOS = '${Platform.OS}'`}
+    <>
+      <SafeAreaView style={styles.container}>
+        <WebView
+          ref={webviewRef}
+          style={styles.webview}
+          source={{uri: URL}}
+          onMessage={handleMessage}
+          thirdPartyCookiesEnabled={true}
+          sharedCookiesEnabled={true}
+          injectedJavaScript={`window.platformOS = '${Platform.OS}'`}
+        />
+      </SafeAreaView>
+
+      <LoginView
+        open={openLogin}
+        close={() => setOpenLogin(false)}
+        sendMessage={sendMessage}
       />
-    </SafeAreaView>
+    </>
   );
 };
 

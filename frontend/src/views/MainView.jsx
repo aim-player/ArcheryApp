@@ -1,25 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BottomNavigation, BottomNavigationAction, Box } from "@mui/material";
+
+import HomeIcon from "@mui/icons-material/Home";
 import EditNoteIcon from "@mui/icons-material/EditNote";
-import PersonIcon from "@mui/icons-material/Person";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+import HomeView from "./HomeView";
 import SheetsView from "./SheetsView";
 import ProfileView from "./ProfileView";
 import NotificationView from "./NotificationView";
 import SettingView from "./SettingView";
 
 import { VIEW } from "../constants/state";
+import PopupView from "./PopupView";
+import { useUser } from "utils/context";
+import { useNavigate } from "react-router-dom";
+import { URL } from "constants/url";
 
 const MainView = () => {
-  const [value, setValue] = useState(VIEW.SHEETS);
+  const navigate = useNavigate();
+  const [user] = useUser();
+  const [value, setValue] = useState(VIEW.HOME);
   const components = {
+    [VIEW.HOME]: <HomeView />,
     [VIEW.SHEETS]: <SheetsView />,
     [VIEW.PROFILE]: <ProfileView />,
     [VIEW.NOTIFICATION]: <NotificationView />,
     [VIEW.SETTING]: <SettingView />,
   };
+
+  useEffect(() => {
+    if (user) {
+      const { role, name } = user;
+      if (!role || !name) navigate(URL.PROFILE_INIT);
+    }
+  }, [value]);
   return (
     <Box
       sx={{
@@ -41,11 +56,12 @@ const MainView = () => {
         onChange={(_, newValue) => setValue(newValue)}
         sx={{ borderTop: "2px solid #000" }}
       >
+        <BottomNavigationAction label="홈" icon={<HomeIcon />} />
         <BottomNavigationAction label="기록" icon={<EditNoteIcon />} />
-        <BottomNavigationAction label="내 정보" icon={<PersonIcon />} />
-        <BottomNavigationAction label="알림" icon={<NotificationsIcon />} />
+        {/* <BottomNavigationAction label="알림" icon={<NotificationsIcon />} /> */}
         <BottomNavigationAction label="설정" icon={<SettingsIcon />} />
       </BottomNavigation>
+      <PopupView />
     </Box>
   );
 };

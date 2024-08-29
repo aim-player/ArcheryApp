@@ -5,8 +5,10 @@ import AddIcon from "@mui/icons-material/Add";
 import SheetCreate from "components/sheet/SheetCreate";
 import SheetView from "./SheetView";
 import { useSheets } from "utils/context";
+import { useDataLoader } from "App";
 
 const SheetsView = () => {
+  const loadData = useDataLoader();
   const [sheets] = useSheets();
   const [open, setOpen] = useState(false);
   const [sheet, setSheet] = useState();
@@ -14,6 +16,10 @@ const SheetsView = () => {
   useEffect(() => {
     if (sheet) setSheet(sheets.find((s) => s.id === sheet.id));
   }, [sheets]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <Box

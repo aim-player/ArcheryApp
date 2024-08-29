@@ -26,8 +26,11 @@ import BackspaceIcon from "@mui/icons-material/Backspace";
 
 import RoundCreate from "components/round/RoundCreate";
 import { SCORE_COLOR } from "constants/rule";
-import { requestFetch } from "App";
+import { requestFetch, useDataLoader } from "App";
 import RoundStats from "components/round/RoundStats";
+import { useEnds, useRounds } from "utils/context";
+import { requestPost } from "utils/fetch";
+import { URL } from "constants/url";
 
 const ButtonPad = [
   ["X", 10, "M", "ERASE"],
@@ -37,6 +40,10 @@ const ButtonPad = [
 ];
 
 const RoundView = ({ sheet, round, setRound, close }) => {
+  const loadData = useDataLoader();
+  const [rounds] = useRounds();
+  const [ends] = useEnds();
+  const [roundEnds, setRoundEnds] = useState([]);
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
   const [currentEnd, setCurrentEnd] = useState();
@@ -57,39 +64,78 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     setEditTarget(round);
     setAnchorEl(null);
   };
-  const deleteRound = () => {};
-  const addEnd = (end) => {
-    if (!currentEnd && round.ends && round.ends.length >= round.endCount)
-      return;
-    if (currentEnd) {
-      round.ends = round.ends.map((e) => {
-        if (currentEnd.id === e.id) e.data = end;
-        return e;
-      });
-      sheet.rounds = sheet.rounds.map((r) => {
-        if (r.id === round.id) r.ends = round.ends;
-        return r;
-      });
-    } else {
-      const newEnd = {
-        id: generateEndId(),
-        data: end,
-      };
-      round.ends = round.ends ? [...round.ends, newEnd] : [newEnd];
-      sheet.rounds = sheet.rounds.map((r) => {
-        if (r.id === round.id) r.ends = round.ends;
-        return r;
-      });
+  const deleteRound = async () => {
+    if (!window.confirm("이 라운드를 삭제할까요?")) return;
+    const requestOptions = {
+      data: { round_id: round.id },
+    };
+    const response = await requestPost(URL.DELETE_ROUND, requestOptions);
+    if (response.status === 200) {
+      setRound(null);
+      loadData();
     }
-    requestFetch("update_sheet", sheet);
-    setCurrentEnd(null);
-    setOpenEditor(false);
   };
-  const editEnd = (end) => {
-    setCurrentEnd(end);
-    setOpenEditor(true);
+  const addEnd = async (scores) => {
+    if (!currentEnd && roundEnds.length >= round.end_count) return;
+
+    const requestOptions = {
+      data: { round_id: round.id, scores },
+    };
+
+    const response = await requestPost(URL.ADD_END, requestOptions);
+    if (response.status === 200) {
+      setCurrentEnd(null);
+      setOpenEditor(false);
+      loadData();
+    }
+    // if (currentEnd) {
+    //   round.ends = round.ends.map((e) => {
+    //     if (currentEnd.id === e.id) e.data = end;
+    //     return e;
+    //   });
+    //   sheet.rounds = sheet.rounds.map((r) => {
+    //     if (r.id === round.id) r.ends = round.ends;
+    //     return r;
+    //   });
+    // } else {
+    //   const newEnd = {
+    //     id: generateEndId(),
+    //     data: end,
+    //   };
+    //   round.ends = round.ends ? [...round.ends, newEnd] : [newEnd];
+    //   sheet.rounds = sheet.rounds.map((r) => {
+    //     if (r.id === round.id) r.ends = round.ends;
+    //     return r;
+    //   });
+    // }
+    // requestFetch("update_sheet", sheet);
+  };
+  const editEnd = async (scores) => {
+    const requestOptions = {
+      data: {
+        end_id: currentEnd.id,
+        scores,
+      },
+    };
+    const response = await requestPost(URL.UPDATE_END, requestOptions);
+    if (response.status === 200) {
+      loadData();
+      setCurrentEnd(null);
+      setOpenEditor(false);
+    }
   };
 
+  useEffect(() => {
+    const roundEnds = ends.filter((e) => e.round_id === round.id);
+    setRoundEnds(roundEnds);
+  }, [ends]);
+
+  useEffect(() => {
+    if (round) {
+      const updatedRound = rounds.find((r) => r.id === round.id);
+      if (updatedRound) setRound(updatedRound);
+    }
+  }, [rounds]);
   return (
     <Box
       sx={{
@@ -126,15 +172,18 @@ const RoundView = ({ sheet, round, setRound, close }) => {
       </DialogTitle>
       <Box sx={{ border: "1px solid #ccc", height: "100%" }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1 }}>
-          {round.ends &&
-            round.ends.map((end, endIndex) => (
+          {roundEnds &&
+            roundEnds.map((end, endIndex) => (
               <MenuItem
                 key={`end_${endIndex}`}
-                onClick={() => editEnd(end)}
+                onClick={() => {
+                  setCurrentEnd(end);
+                  setOpenEditor(true);
+                }}
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  height: (round.arrowCount / 3) * 50,
+                  height: (round.arrow_count / 3) * 50,
                   border: "1px solid #ccc",
                   padding: 0,
                 }}
@@ -149,30 +198,37 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                     height: "100%",
                   }}
                 >
-                  E{end.id}
+                  E{endIndex + 1}
                 </Box>
-                {end.data && (
+                {end.scores && (
                   <>
                     <Grid
                       container
                       sx={{ flex: 1, display: "flex", height: "100%" }}
                     >
-                      {end.data.map((score, scoreIndex) => (
-                        <Grid
-                          item
-                          xs={4}
-                          key={`${endIndex}_${scoreIndex}`}
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            border: "1px solid #ccc",
-                            color: score ? "#000" : "transparent",
-                          }}
-                        >
-                          {score ? score : 0}
-                        </Grid>
-                      ))}
+                      {Array(round.arrow_count)
+                        .fill(null)
+                        .map((_, scoreIndex) => {
+                          const scores = JSON.parse(end.scores);
+                          return (
+                            <Grid
+                              item
+                              xs={4}
+                              key={`${endIndex}_${scoreIndex}`}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                border: "1px solid #ccc",
+                                color: scores[scoreIndex]
+                                  ? "#000"
+                                  : "transparent",
+                              }}
+                            >
+                              {scores[scoreIndex] ? scores[scoreIndex] : 0}
+                            </Grid>
+                          );
+                        })}
                     </Grid>
                     <Grid
                       container
@@ -186,9 +242,9 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                       }}
                     >
                       {Array.from({
-                        length: Math.ceil(end.data.length / 3),
+                        length: Math.ceil(round.arrow_count / 3),
                       }).map((_, index) => {
-                        const sum = end.data
+                        const sum = JSON.parse(end.scores)
                           .slice(index * 3, index * 3 + 3)
                           .reduce((acc, curr) => {
                             if (curr === "M") curr = 0;
@@ -225,7 +281,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                         border: "1px solid #ccc",
                       }}
                     >
-                      {end.data.reduce((acc, curr) => {
+                      {JSON.parse(end.scores).reduce((acc, curr) => {
                         if (curr === "M") curr = 0;
                         else if (curr === "X") curr = 10;
                         return acc + curr;
@@ -235,7 +291,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 )}
               </MenuItem>
             ))}
-          {(!round.ends || round.ends.length < round.endCount) && (
+          {(!roundEnds || roundEnds.length < round.end_count) && (
             <MenuItem
               onClick={() => {
                 setCurrentEnd(null);
@@ -244,7 +300,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                height: (round.arrowCount / 3) * 50,
+                height: (round.arrow_count / 3) * 50,
                 border: "1px solid #ccc",
                 padding: 0,
               }}
@@ -263,7 +319,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 E0
               </Box>
               <Grid container sx={{ flex: 1, height: "100%" }}>
-                {Array(round.arrowCount)
+                {Array(round.arrow_count)
                   .fill(null)
                   .map((score, scoreIndex) => (
                     <Grid
@@ -293,7 +349,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 }}
               >
                 {Array.from({
-                  length: Math.ceil(round.arrowCount / 3),
+                  length: Math.ceil(round.arrow_count / 3),
                 }).map((_, index) => {
                   return (
                     <Grid
@@ -325,7 +381,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
             </MenuItem>
           )}
         </Box>
-        {(!round.ends || round.ends.length < round.endCount) && (
+        {(!roundEnds || roundEnds.length < round.end_count) && (
           <Button
             variant="contained"
             sx={{
@@ -373,7 +429,12 @@ const RoundView = ({ sheet, round, setRound, close }) => {
         }}
         fullWidth
       >
-        <ScoreEditor round={round} end={currentEnd} addEnd={addEnd} />
+        <ScoreEditor
+          round={round}
+          end={currentEnd}
+          addEnd={addEnd}
+          editEnd={editEnd}
+        />
       </Dialog>
       <Dialog open={openStats} onClose={() => setOpenStats(false)} fullScreen>
         <RoundStats round={round} close={() => setOpenStats(false)} />
@@ -384,11 +445,11 @@ const RoundView = ({ sheet, round, setRound, close }) => {
 
 export default RoundView;
 
-const ScoreEditor = ({ round, end, addEnd }) => {
-  const [scores, setScores] = useState(Array(round.arrowCount).fill(null));
+const ScoreEditor = ({ round, end, addEnd, editEnd }) => {
+  const [scores, setScores] = useState(Array(round.arrow_count).fill(null));
 
   const applyEnd = () => {
-    setScores(end.data);
+    setScores(JSON.parse(end.scores));
   };
   const writeScore = (button) => {
     const convertScore = (score) => {
@@ -437,7 +498,8 @@ const ScoreEditor = ({ round, end, addEnd }) => {
         });
         break;
       case "SAVE":
-        addEnd(scores);
+        if (end) editEnd(scores);
+        else addEnd(scores);
         break;
       default:
         hasEmpty = scores.some((score) => score === null);

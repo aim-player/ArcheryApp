@@ -1,6 +1,7 @@
 export const VIEW = {
-  SHEETS: 0,
-  PROFILE: 1,
-  NOTIFICATION: 2,
-  SETTING: 3,
+  HOME: 0,
+  SHEETS: 1,
+  PROFILE: 2,
+  NOTIFICATION: 3,
+  SETTING: 4,
 };

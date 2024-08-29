@@ -20,10 +20,13 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { requestFetch } from "App";
+import { requestFetch, useDataLoader } from "App";
 import { usePlaces, useSheets } from "utils/context";
+import { requestPost } from "utils/fetch";
+import { URL } from "constants/url";
 
 const SheetCreate = ({ close, editTarget, setSheet }) => {
+  const loadData = useDataLoader();
   const [sheets] = useSheets();
   const [places] = usePlaces();
   const [popup, setPopup] = useState({ places: false, addPlace: false });
@@ -69,43 +72,57 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
     });
     return id;
   };
-  const addSheet = () => {
-    const id = generateSheetId();
+  const add = async () => {
+    // const id = generateSheetId();
+
     const newSheet = {
-      id,
       ...inputs,
-      startTime: inputs.startTime.format("HH:mm"),
-      endTime: inputs.endTime.format("HH:mm"),
-      date: inputs.date.format("YYYY/MM/DD"),
-      created_at: dayjs().format("YYYYMMDDHHmmss"),
+      startTime: inputs.startTime.format("HH:mm:ss"),
+      endTime: inputs.endTime.format("HH:mm:ss"),
+      date: inputs.date.format("YYYY-MM-DD"),
+      // created_at: dayjs().format("YYYYMMDDHHmmss"),
     };
-    setSheet(newSheet);
-    requestFetch("add_sheet", newSheet);
-    close();
+    const requestOptions = {
+      data: newSheet,
+    };
+    const response = await requestPost(URL.ADD_SHEET, requestOptions);
+    if (response.status === 200) {
+      loadData();
+      close();
+    }
+    // setSheet(newSheet);
+    // requestFetch("add_sheet", newSheet);
+    // close();
   };
-  const updateSheet = () => {
+  const update = async () => {
     const updatedSheet = {
-      id: editTarget.id,
+      sheet_id: editTarget.id,
       ...inputs,
       startTime: inputs.startTime.format("HH:mm"),
       endTime: inputs.endTime.format("HH:mm"),
       date: inputs.date.format("YYYY/MM/DD"),
-      created_at: dayjs().format("YYYYMMDDHHmmss"),
     };
-    setSheet(updatedSheet);
-    requestFetch("update_sheet", updatedSheet);
-    close();
+    // setSheet(updatedSheet);
+    const requestOptions = {
+      data: updatedSheet,
+    };
+    const response = await requestPost(URL.UPDATE_SHEET, requestOptions);
+    if (response.status === 200) {
+      loadData();
+      close();
+    }
+    // requestFetch("update_sheet", updatedSheet);
   };
 
   const applyEditTarget = () => {
-    const { name, place, date, startTime, endTime } = editTarget;
+    const { name, place, date, start_time, end_time } = editTarget;
     setInputs((state) => ({
       ...state,
       name,
       place,
       date: dayjs(date),
-      startTime: dayjs(`${date}${startTime}`),
-      endTime: dayjs(`${date}${endTime}`),
+      startTime: dayjs(`${dayjs(date).format("YYYYMMDD")}${start_time}`),
+      endTime: dayjs(`${dayjs(date).format("YYYYMMDD")}${end_time}`),
     }));
   };
 
@@ -214,7 +231,7 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
           fullWidth
           variant="contained"
           sx={{ p: 1 }}
-          onClick={editTarget ? updateSheet : addSheet}
+          onClick={editTarget ? update : add}
         >
           {editTarget ? "수정하기" : "추가하기"}
         </Button>

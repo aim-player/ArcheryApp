@@ -20,11 +20,16 @@ import SheetCreate from "components/sheet/SheetCreate";
 import dayjs from "dayjs";
 import RoundCreate from "components/round/RoundCreate";
 import RoundView from "./RoundView";
-import { requestFetch } from "App";
-import { useSheets } from "utils/context";
+import { requestFetch, useDataLoader } from "App";
+import { useRounds, useSheets } from "utils/context";
+import { requestPost } from "utils/fetch";
+import { URL } from "constants/url";
 
 const SheetView = ({ sheet, setSheet }) => {
+  const loadData = useDataLoader();
   const [sheets] = useSheets();
+  const [rounds] = useRounds();
+  const [sheetRounds, setSheetRounds] = useState([]);
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
   const [round, setRound] = useState();
@@ -34,10 +39,21 @@ const SheetView = ({ sheet, setSheet }) => {
     setEditTarget(sheet);
     setAnchorEl(null);
   };
-  const deleteSheet = () => {
+  const deleteSheet = async () => {
     if (!window.confirm("이 시트를 삭제할까요?")) return;
-    setSheet(null);
-    requestFetch("delete_sheet", { id: sheet.id });
+    // requestFetch("delete_sheet", { id: sheet.id });
+    const requestOptions = {
+      data: { sheet_id: sheet.id },
+    };
+    const response = await requestPost(URL.DELETE_SHEET, requestOptions);
+    if (response.status === 200) {
+      setSheet(null);
+      loadData();
+    }
+  };
+
+  const convertDate = (date) => {
+    return date ? dayjs(date).format("YYYY-MM-DD") : null;
   };
 
   useEffect(() => {
@@ -46,6 +62,11 @@ const SheetView = ({ sheet, setSheet }) => {
       if (exists) setRound(exists);
     }
   }, [sheets]);
+
+  useEffect(() => {
+    const sheetRounds = rounds.filter((r) => r.sheet_id === sheet.id);
+    setSheetRounds(sheetRounds);
+  }, [rounds]);
 
   return (
     <Box
@@ -89,25 +110,29 @@ const SheetView = ({ sheet, setSheet }) => {
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
           <span>날짜</span>
-          <span>{sheet.date}</span>
+          <span>{convertDate(sheet.date)}</span>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
           <span>시간</span>
           <span>
-            {dayjs(`${sheet.date}${sheet.startTime}`).format("a h:mm")}
+            {dayjs(
+              `${dayjs(sheet.date).format("YYYYMMDD")}${sheet.start_time}`
+            ).format("a h:mm")}
             &nbsp;-&nbsp;
-            {dayjs(`${sheet.date}${sheet.endTime}`).format("a h:mm")}
+            {dayjs(
+              `${dayjs(sheet.date).format("YYYYMMDD")}${sheet.end_time}`
+            ).format("a h:mm")}
           </span>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
           <span>장소</span>
-          <span>{sheet.place}</span>
+          <span>{sheet.place ? sheet.place : "미지정"}</span>
         </Box>
       </Box>
       <Divider />
-      {sheet.rounds && sheet.rounds.length > 0 ? (
+      {sheetRounds && sheetRounds.length > 0 ? (
         <Box sx={{ flex: 1 }}>
-          {sheet.rounds.map((r, index) => (
+          {sheetRounds.map((r, index) => (
             <MenuItem
               onClick={() => setRound(r)}
               key={`round_${index}`}
@@ -122,10 +147,10 @@ const SheetView = ({ sheet, setSheet }) => {
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <CallMadeIcon />
-                  {r.arrowCount}
+                  {r.arrow_count}
                 </Box>
                 <span>X</span>
-                <span>{r.endCount}엔드</span>
+                <span>{r.end_count}엔드</span>
               </Box>
               <ArrowForwardIosIcon sx={{ width: 20, height: 20 }} />
             </MenuItem>
