@@ -300,7 +300,7 @@ const updatePlayerProfile = async (req, res) => {
       // Update Profile
       let queryString = [];
       for (let key in data) {
-        if (data[key] !== null) {
+        if (data[key] !== "") {
           queryString.push(`${key}='${data[key]}'`);
         }
       }
@@ -314,7 +314,7 @@ const updatePlayerProfile = async (req, res) => {
       let keys = [];
       let values = [];
       for (let key in data) {
-        if (data[key] !== null) {
+        if (data[key] !== "") {
           keys.push(key);
           values.push(`'${data[key]}'`);
         }

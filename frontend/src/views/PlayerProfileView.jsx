@@ -20,20 +20,20 @@ import dayjs from "dayjs";
 const View = ({ close }) => {
   const [user] = useUser();
   const [currentProfile, setCurrentProfile] = useState({
-    name: null,
-    team: null,
-    birth: null,
-    gender: null,
-    country: null,
-    image_url: null,
+    name: "",
+    team: "",
+    birth: "",
+    gender: "",
+    country: "",
+    image_url: "",
     visible: 0,
   });
   const [inputs, setInputs] = useState({
-    team: null,
-    birth: null,
-    gender: null,
-    country: null,
-    image_url: null,
+    team: "",
+    birth: "",
+    gender: "",
+    country: "",
+    image_url: "",
     visible: 0,
   });
   const getPlayerProfile = async () => {
