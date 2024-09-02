@@ -41,6 +41,7 @@ const getUser = async (platform, email) => {
     return rows.length > 0 ? rows[0] : null;
   } catch (err) {
     console.error("Get User Error: ", err);
+    res.sendStatus(500);
   } finally {
     if (conn) conn.release();
   }
@@ -53,6 +54,7 @@ const createUser = async (platform, email) => {
     return rows.length > 0 ? rows[0] : null;
   } catch (err) {
     console.error("Create User Error: ", err);
+    res.sendStatus(500);
   } finally {
     if (conn) conn.release();
   }

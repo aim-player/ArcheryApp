@@ -26,6 +26,20 @@ const getUserData = async (req, res) => {
     if (conn) conn.release();
   }
 };
+const getPlaces = async (req, res) => {
+  let conn;
+  try {
+    const { id } = req.userInfo;
+    conn = await pool.getConnection();
+    const rows = await conn.query(QUERY.GET_PLACES, [id]);
+    res.json({ places: rows });
+  } catch (err) {
+    console.error("Get Places Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
 const addProfile = async (req, res) => {
   let conn;
@@ -99,6 +113,21 @@ const addEnd = async (req, res) => {
       round_id,
       JSON.stringify(scores),
     ]);
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Add Round Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const addPlace = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const { name } = req.body;
+    const rows = await conn.query(QUERY.ADD_PLACE, [id, name]);
     res.json(rows[0]);
   } catch (err) {
     console.error("Add Round Error: ", err);
@@ -227,17 +256,101 @@ const deleteRound = async (req, res) => {
     if (conn) conn.release();
   }
 };
+const deletePlace = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const { place_id } = req.body;
+    await conn.query(QUERY.DELETE_PLACE, [id, place_id]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Delete Sheet Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const getPlayerProfile = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const rows = await conn.query(QUERY.GET_PLAYER_PROFILE, [id]);
+
+    if (rows.length > 0) return res.json({ player_profile: rows[0] });
+    else return res.send({});
+  } catch (err) {
+    console.error("Get Player Profile Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const updatePlayerProfile = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const data = req.body;
+    const rows = await conn.query(QUERY.GET_PLAYER_PROFILE, [id]);
+    if (rows.length > 0) {
+      // Update Profile
+      let queryString = [];
+      for (let key in data) {
+        if (data[key] !== null) {
+          queryString.push(`${key}='${data[key]}'`);
+        }
+      }
+      if (queryString.length > 0) {
+        queryString = queryString.join(",");
+        const query = `update player_profile set ${queryString} where user_id='${id}'`;
+        await conn.query(query);
+      }
+    } else {
+      // Insert Profile
+      let keys = [];
+      let values = [];
+      for (let key in data) {
+        if (data[key] !== null) {
+          keys.push(key);
+          values.push(`'${data[key]}'`);
+        }
+      }
+      if (keys.length > 0) {
+        const query = `insert into player_profile (user_id, ${keys.join(
+          ","
+        )}) values ('${id}', ${values.join(",")})`;
+        await conn.query(query);
+      }
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Update Player Profile Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
 module.exports = {
   getUserData,
+  getPlaces,
   addProfile,
   addSheet,
   addRound,
   addEnd,
+  addPlace,
   deleteSheet,
   deleteRound,
+  deletePlace,
   updateSheet,
   updateRound,
   updateEnd,
   updateEnds,
+  getPlayerProfile,
+  updatePlayerProfile,
 };

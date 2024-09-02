@@ -20,15 +20,15 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { requestFetch, useDataLoader } from "App";
+import { useDataLoader } from "App";
 import { usePlaces, useSheets } from "utils/context";
-import { requestPost } from "utils/fetch";
+import { requestGet, requestPost } from "utils/fetch";
 import { URL } from "constants/url";
 
-const SheetCreate = ({ close, editTarget, setSheet }) => {
+const SheetCreate = ({ close, editTarget }) => {
   const loadData = useDataLoader();
   const [sheets] = useSheets();
-  const [places] = usePlaces();
+  const [places, setPlaces] = usePlaces();
   const [popup, setPopup] = useState({ places: false, addPlace: false });
   const [place, setPlace] = useState("");
   const [inputs, setInputs] = useState({
@@ -38,18 +38,39 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
     startTime: dayjs(),
     endTime: dayjs(),
   });
-
-  const addPlace = () => {
-    const isDuplicated = places.find((p) => p === place);
-    if (isDuplicated) return alert("이미 추가된 장소입니다.");
-    requestFetch("update_places", [...places, place]);
-    setPlace("");
+  const getPlaces = async () => {
+    const response = await requestGet(URL.GET_PLACES);
+    if (response.status === 200) {
+      const { places } = response.data;
+      setPlaces(places);
+    }
+  };
+  const addPlace = async () => {
+    const exists = places.find((p) => p === place);
+    if (exists) return alert("이미 추가된 장소입니다.");
+    const requestOptions = {
+      data: { name: place },
+    };
+    const response = await requestPost(URL.ADD_PLACE, requestOptions);
+    if (response.status === 200) {
+      getPlaces();
+      setPlace("");
+      setPopup((state) => ({ ...state, places: true, addPlace: false }));
+    }
+    // requestFetch("update_places", [...places, place]);
   };
 
-  const deletePlace = (place) => {
+  const deletePlace = async (place) => {
     if (window.confirm("이 장소를 삭제할까요?")) {
-      const restPlaces = places.filter((p) => p !== place);
-      requestFetch("update_places", restPlaces);
+      const requestOptions = {
+        data: {
+          place_id: place.id,
+        },
+      };
+      const response = await requestPost(URL.DELETE_PLACE, requestOptions);
+      if (response.status === 200) getPlaces();
+      // const restPlaces = places.filter((p) => p !== place);
+      // requestFetch("update_places", restPlaces);
     }
   };
 
@@ -127,8 +148,13 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
   };
 
   useEffect(() => {
+    getPlaces();
     if (editTarget) applyEditTarget();
   }, []);
+
+  useEffect(() => {
+    if (popup.addPlace) getPlaces();
+  }, [popup.addPlace]);
 
   return (
     <Box
@@ -283,7 +309,7 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
                     paddingBottom: 1,
                   }}
                 >
-                  <span>{place}</span>
+                  <span>{place.name}</span>
                   <ButtonGroup
                     sx={{
                       display: "flex",
@@ -294,7 +320,7 @@ const SheetCreate = ({ close, editTarget, setSheet }) => {
                     <Button
                       variant="contained"
                       onClick={() => {
-                        setInputs((state) => ({ ...state, place: place }));
+                        setInputs((state) => ({ ...state, place: place.name }));
                         setPopup((state) => ({ ...state, places: false }));
                       }}
                     >

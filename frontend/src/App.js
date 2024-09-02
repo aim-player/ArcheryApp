@@ -14,7 +14,7 @@ import "dayjs/locale/ko";
 import MainView from "./views/MainView";
 import theme from "./utils/theme";
 import "./App.css";
-import { getUserData, refreshSession, requestLogin } from "utils/fetch";
+import { refreshSession, requestGet, requestLogin } from "utils/fetch";
 import ProfileInitializer from "components/login/ProfileInitializer";
 import { URL } from "constants/url";
 import { CustomAlert, CustomConfirm } from "components/Components";
@@ -139,10 +139,13 @@ export const useDataLoader = () => {
 
   const loadData = async () => {
     if (!user) return;
-    const { sheets, rounds, ends } = await getUserData();
-    setSheets(sheets);
-    setRounds(rounds);
-    setEnds(ends);
+    const response = await requestGet(URL.GET_USERDATA);
+    if (response.status === 200) {
+      const { sheets, rounds, ends } = response.data;
+      setSheets(sheets);
+      setRounds(rounds);
+      setEnds(ends);
+    }
   };
 
   return loadData;

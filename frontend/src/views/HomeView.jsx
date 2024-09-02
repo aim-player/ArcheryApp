@@ -1,14 +1,24 @@
-import { Avatar, Box, Button, MenuItem, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { useUser } from "utils/context";
 import { requestFetch, useDataLoader } from "App";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import PlayerProfileView from "./PlayerProfileView";
 
 const HomeView = () => {
   const [user] = useUser();
   const loadData = useDataLoader();
+  const [openPlayerProfile, setOpenPlayerProfile] = useState(false);
 
   useEffect(() => {
     if (user) loadData();
@@ -27,9 +37,18 @@ const HomeView = () => {
           }}
         >
           <Typography sx={{ fontWeight: "bold" }}>{user.name}</Typography>
-          <Button variant="contained" sx={{ p: 1 }}>
-            <NotificationsIcon />
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="contained"
+              sx={{ p: 1 }}
+              onClick={() => setOpenPlayerProfile(true)}
+            >
+              <PersonIcon />
+            </Button>
+            <Button variant="contained" sx={{ p: 1 }}>
+              <NotificationsIcon />
+            </Button>
+          </Box>
         </Box>
       ) : (
         <MenuItem
@@ -100,6 +119,9 @@ const HomeView = () => {
           </Button>
         </Box>
       </Box>
+      <Dialog open={openPlayerProfile} fullScreen>
+        <PlayerProfileView close={() => setOpenPlayerProfile(false)} />
+      </Dialog>
     </Box>
   );
 };

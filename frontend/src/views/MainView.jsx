@@ -7,7 +7,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import HomeView from "./HomeView";
 import SheetsView from "./SheetsView";
-import ProfileView from "./ProfileView";
 import NotificationView from "./NotificationView";
 import SettingView from "./SettingView";
 
@@ -22,9 +21,8 @@ const MainView = () => {
   const [user] = useUser();
   const [value, setValue] = useState(VIEW.HOME);
   const components = {
-    [VIEW.HOME]: <HomeView />,
+    [VIEW.HOME]: <HomeView setMenu={(v) => setValue(v)} />,
     [VIEW.SHEETS]: <SheetsView />,
-    [VIEW.PROFILE]: <ProfileView />,
     [VIEW.NOTIFICATION]: <NotificationView />,
     [VIEW.SETTING]: <SettingView />,
   };

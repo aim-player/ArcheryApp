@@ -16,6 +16,11 @@ const {
   updateRound,
   updateEnd,
   updateEnds,
+  getPlaces,
+  addPlace,
+  deletePlace,
+  getPlayerProfile,
+  updatePlayerProfile,
 } = require("./user");
 
 const app = express();
@@ -41,19 +46,30 @@ app.get("/refresh_session", refreshSession);
 // User
 app.post("/user/profile", validateSession, addProfile);
 app.get("/user/data", validateSession, getUserData);
+app.get("/user/places", validateSession, getPlaces);
+
+// Player
+app.get("/player/profile/get", validateSession, getPlayerProfile);
+app.post("/player/profile/update", validateSession, updatePlayerProfile);
 
 // Sheet
 app.post("/sheet/add", validateSession, addSheet);
 app.post("/sheet/update", validateSession, updateSheet);
 app.post("/sheet/delete", validateSession, deleteSheet);
 
+// Round
 app.post("/round/add", validateSession, addRound);
 app.post("/round/update", validateSession, updateRound);
 app.post("/round/delete", validateSession, deleteRound);
 
+// End
 app.post("/end/add", validateSession, addEnd);
 app.post("/end/update", validateSession, updateEnd);
 app.post("/end/update_all", validateSession, updateEnds);
+
+// Place
+app.post("/place/add", validateSession, addPlace);
+app.post("/place/delete", validateSession, deletePlace);
 
 app.listen(8080, () => {
   console.log("======== Nodejs Server Started");

@@ -9,6 +9,10 @@ export const URL = {
   // User
   ADD_PROFILE: "/user/profile",
   GET_USERDATA: "/user/data",
+  GET_PLACES: "/user/places",
+
+  GET_PLAYER_PROFILE: "/player/profile/get",
+  UPDATE_PLAYER_PROFILE: "/player/profile/update",
 
   // Sheet
   ADD_SHEET: "/sheet/add",
@@ -20,4 +24,6 @@ export const URL = {
   ADD_END: "/end/add",
   UPDATE_END: "/end/update",
   UPDATE_END_ALL: "/end/update_all",
+  ADD_PLACE: "/place/add",
+  DELETE_PLACE: "/place/delete",
 };

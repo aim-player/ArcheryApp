@@ -42,3 +42,21 @@ create table if not exists ends (
   scores text,
   constraint fk_ends_rounds foreign key (round_id) references rounds(id) on delete cascade
 );
+
+create table if not exists places (
+  id int primary key auto_increment,
+  user_id char(36) not null,
+  name varchar(100) not null,
+  create_time timestamp default current_timestamp
+);
+
+create table if not exists player_profile (
+  user_id char(36) primary key not null,
+  image_url varchar(255),
+  team varchar(50),
+  birth varchar(20),
+  gender tinyint(1),
+  country varchar(50),
+  visible tinyint(1) default 1,
+  constraint fk_users_player_profile foreign key (user_id) references users(id) on delete cascade
+);
