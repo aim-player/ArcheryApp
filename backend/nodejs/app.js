@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 require("./mariadb");
+console.log("ENV TEST: ", process.env.TEST)
 
 const { authenticateUser, validateSession, refreshSession } = require("./auth");
 const {
