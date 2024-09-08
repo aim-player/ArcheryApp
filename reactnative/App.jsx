@@ -3,7 +3,7 @@ import {SafeAreaView, StyleSheet, Platform} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
 import {createSheet, deleteSheets, updateSheet} from '@/src/sheetManager';
-import LoginView from '@/src/LoginView.jsx';
+import LoginView, {signOutGoogle} from '@/src/LoginView.jsx';
 import {URL} from '@env';
 
 const directoryPath = `${RNFS.DocumentDirectoryPath}`;
@@ -128,6 +128,8 @@ const App = () => {
       console.log('LOG ===== ' + JSON.stringify(message.data));
     } else if (message.type === 'login') {
       setOpenLogin(true);
+    } else if (message.type === 'signout') {
+      signOutGoogle();
     }
   };
 

@@ -1,6 +1,7 @@
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 require("./mariadb");
 
 const { authenticateUser, validateSession, refreshSession } = require("./auth");
@@ -21,6 +22,7 @@ const {
   deletePlace,
   getPlayerProfile,
   updatePlayerProfile,
+  getTeam,
 } = require("./user");
 
 const app = express();
@@ -31,7 +33,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:8081"],
+    origin: process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(",")
+      : ["http://localhost:3000", "http://localhost:8081"],
     credentials: true,
   })
 );
@@ -70,6 +74,9 @@ app.post("/end/update_all", validateSession, updateEnds);
 // Place
 app.post("/place/add", validateSession, addPlace);
 app.post("/place/delete", validateSession, deletePlace);
+
+// Team
+app.get("/team", validateSession, getTeam);
 
 app.listen(8080, () => {
   console.log("======== Nodejs Server Started");

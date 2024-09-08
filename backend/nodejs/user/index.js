@@ -44,11 +44,11 @@ const getPlaces = async (req, res) => {
 const addProfile = async (req, res) => {
   let conn;
   try {
-    const { role, name, teamName } = req.body;
+    const { role, name } = req.body;
     const { email } = req.userInfo;
 
     conn = await pool.getConnection();
-    await conn.query(QUERY.ADD_PROFILE, [role, name, teamName, email]);
+    await conn.query(QUERY.ADD_PROFILE, [role, name, email]);
     res.json(req.body);
   } catch (err) {
     console.error("Add Profile Error: ", err);
@@ -336,6 +336,22 @@ const updatePlayerProfile = async (req, res) => {
   }
 };
 
+const getTeam = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { team_id } = req.userInfo;
+
+    const rows = await conn.query(QUERY.GET_TEAM, [team_id]);
+    return res.json({ players: rows });
+  } catch (err) {
+    console.error("Get Team Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
 module.exports = {
   getUserData,
   getPlaces,
@@ -353,4 +369,5 @@ module.exports = {
   updateEnds,
   getPlayerProfile,
   updatePlayerProfile,
+  getTeam,
 };

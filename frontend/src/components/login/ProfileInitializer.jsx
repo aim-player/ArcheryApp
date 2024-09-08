@@ -11,37 +11,38 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useConfirm, useUser } from "utils/context";
-import { addProfile, requestLogOut } from "utils/fetch";
-import { useNavigate } from "react-router-dom";
+import { addProfile, requestGet, requestPost } from "utils/fetch";
 import { useEffect, useState } from "react";
+import { URL } from "constants/url";
+import { useNavigate } from "react-router-dom";
 
 const ProfileInitializer = () => {
-  const [inputs, setInputs] = useState({ role: 1, name: "", teamName: "" });
+  const navigate = useNavigate();
+  const [inputs, setInputs] = useState({ role: 1, name: "" });
   const [formState, setFormState] = useState({
     name: { error: false, helperText: "" },
-    teamName: { error: false, helperText: "" },
   });
   const [, setConfirm] = useConfirm();
-  const [, setUser] = useUser();
-  const navigate = useNavigate();
-  const logOut = () => {
-    requestLogOut();
-    setUser(null);
+  const [user, setUser] = useUser();
+  const logOut = async () => {
+    if (!user) return navigate("/");
+    const response = await requestGet(URL.LOGOUT);
+    if (response.status === 200) {
+      if (user.platform === "google") {
+        if (window.ReactNativeWebView)
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "signout",
+              payload: { platform: user.platform },
+            })
+          );
+      }
+      setUser(null);
+    }
     navigate("/");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (inputs.role === 2 && inputs.teamName === "") {
-      setFormState((state) => ({
-        ...state,
-        teamName: {
-          ...state.teamName,
-          error: true,
-          helperText: "필수 입력 항목입니다.",
-        },
-      }));
-      return;
-    }
     if (inputs.name === "") {
       setFormState((state) => ({
         ...state,
@@ -53,11 +54,18 @@ const ProfileInitializer = () => {
       }));
       return;
     }
-    const data = await addProfile(inputs);
-    setUser((state) => ({ ...state, ...data }));
+    // const data = await addProfile(inputs);
+    const requestOptions = {
+      data: inputs,
+    };
+    const response = await requestPost(URL.ADD_PROFILE, requestOptions);
+    if (response.status) {
+      setUser((state) => ({ ...state, ...response.data }));
+      navigate("/");
+    }
   };
   useEffect(() => {
-    setInputs((state) => ({ ...state, name: "", teamName: "" }));
+    setInputs((state) => ({ ...state, name: "" }));
   }, [inputs.role]);
   return (
     <Box
@@ -120,26 +128,6 @@ const ProfileInitializer = () => {
             <FormControlLabel label="선수" control={<Radio />} value={1} />
             <FormControlLabel label="마스터" control={<Radio />} value={2} />
           </RadioGroup>
-          {inputs.role === 2 && (
-            <TextField
-              value={inputs.teamName}
-              error={formState.teamName.error}
-              helperText={formState.teamName.helperText}
-              onChange={(e) => {
-                setInputs((state) => ({ ...state, teamName: e.target.value }));
-                setFormState((state) => ({
-                  ...state,
-                  teamName: {
-                    error: false,
-                    helperText: "",
-                  },
-                }));
-              }}
-              fullWidth
-              placeholder="팀 이름"
-              sx={{ "& .MuiInputBase-root": { p: 1 } }}
-            />
-          )}
           <TextField
             value={inputs.name}
             error={formState.name.error}

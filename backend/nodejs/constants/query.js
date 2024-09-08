@@ -4,7 +4,7 @@ const QUERY = {
     "insert into users (id, platform, email) values (?, ?,?) returning *",
 
   GET_PLAYER_PROFILE: "select * from player_profile where user_id=?",
-  ADD_PROFILE: "update users set role=?, name=?, team_name=? where email=?",
+  ADD_PROFILE: "update users set role=?, name=? where email=?",
   ADD_SHEET:
     "insert into sheets (user_id, name, date, start_time, end_time, place) values (?, ?, ?, ?, ?, ?) returning *",
   ADD_ROUND:
@@ -25,6 +25,7 @@ const QUERY = {
   UPDATE_ROUND:
     "update rounds set distance=?, arrow_count=?, end_count=? where id=? and user_id=?",
   UPDATE_END: "update ends set scores=? where id=? and user_id=?",
+  GET_TEAM: "select * from users where team_id=?",
 };
 
 module.exports = {

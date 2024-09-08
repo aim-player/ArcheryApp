@@ -15,6 +15,15 @@ import {
 import {useEffect} from 'react';
 import {GOOGLE_CLIENT_ID} from '@env';
 
+export const signOutGoogle = async () => {
+  try {
+    await GoogleSignin.signOut();
+    console.log('User signed out successfully');
+  } catch (err) {
+    console.error('User sign out error', err);
+  }
+};
+
 const LoginView = ({open, close, sendMessage}) => {
   const tryLogin = async () => {
     try {

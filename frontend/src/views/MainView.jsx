@@ -4,17 +4,18 @@ import { BottomNavigation, BottomNavigationAction, Box } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import SettingsIcon from "@mui/icons-material/Settings";
+import GroupsIcon from "@mui/icons-material/Groups";
 
 import HomeView from "./HomeView";
 import SheetsView from "./SheetsView";
-import NotificationView from "./NotificationView";
 import SettingView from "./SettingView";
+import PopupView from "./PopupView";
 
 import { VIEW } from "../constants/state";
-import PopupView from "./PopupView";
 import { useUser } from "utils/context";
 import { useNavigate } from "react-router-dom";
 import { URL } from "constants/url";
+import GroupView from "./GroupView";
 
 const MainView = () => {
   const navigate = useNavigate();
@@ -23,8 +24,8 @@ const MainView = () => {
   const components = {
     [VIEW.HOME]: <HomeView setMenu={(v) => setValue(v)} />,
     [VIEW.SHEETS]: <SheetsView />,
-    [VIEW.NOTIFICATION]: <NotificationView />,
     [VIEW.SETTING]: <SettingView />,
+    [VIEW.GROUP]: <GroupView />,
   };
 
   useEffect(() => {
@@ -51,13 +52,35 @@ const MainView = () => {
       <BottomNavigation
         showLabels
         value={value}
-        onChange={(_, newValue) => setValue(newValue)}
+        onChange={(e, newValue) => {
+          setValue(newValue);
+          console.log(newValue);
+          console.log(e);
+        }}
         sx={{ borderTop: "2px solid #000" }}
       >
-        <BottomNavigationAction label="홈" icon={<HomeIcon />} />
-        <BottomNavigationAction label="기록" icon={<EditNoteIcon />} />
-        {/* <BottomNavigationAction label="알림" icon={<NotificationsIcon />} /> */}
-        <BottomNavigationAction label="설정" icon={<SettingsIcon />} />
+        <BottomNavigationAction
+          value={VIEW.HOME}
+          label="홈"
+          icon={<HomeIcon />}
+        />
+        <BottomNavigationAction
+          value={VIEW.SHEETS}
+          label="기록"
+          icon={<EditNoteIcon />}
+        />
+        {user && user.role === 2 && (
+          <BottomNavigationAction
+            value={VIEW.GROUP}
+            label="팀 관리"
+            icon={<GroupsIcon />}
+          />
+        )}
+        <BottomNavigationAction
+          value={VIEW.SETTING}
+          label="설정"
+          icon={<SettingsIcon />}
+        />
       </BottomNavigation>
       <PopupView />
     </Box>

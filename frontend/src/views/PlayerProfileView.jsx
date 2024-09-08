@@ -151,15 +151,9 @@ const View = ({ close }) => {
                 <Grid item xs={4}>
                   소속팀
                 </Grid>
-                <TextField
-                  value={inputs.team}
-                  onChange={(e) =>
-                    setInputs((state) => ({ ...state, team: e.target.value }))
-                  }
-                  placeholder="팀 이름"
-                  fullWidth
-                  sx={{ "& .MuiInputBase-root": { p: 1 } }}
-                />
+                <Box sx={{ width: "100%", p: 1 }}>
+                  {user.team_id ? user.team_id : "무소속"}
+                </Box>
               </Grid>
               <Grid
                 sx={{

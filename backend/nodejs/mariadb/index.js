@@ -24,6 +24,7 @@ const pool = M.createPool({
       await conn.query(query.trim());
     });
   } catch (err) {
+    console.error("init error: ", err);
   } finally {
     if (conn) conn.release();
   }

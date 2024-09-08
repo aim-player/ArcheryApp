@@ -4,11 +4,11 @@ use archery;
 
 create table if not exists users (
   id char(36) primary key not null default (UUID()),
-  role int,
   platform varchar(20) not null,
   email varchar(255) not null,
   name varchar(100),
-  team_name varchar(100),
+  role int,
+  team_id char(36),
   create_time timestamp default current_timestamp
 );
 
@@ -53,10 +53,17 @@ create table if not exists places (
 create table if not exists player_profile (
   user_id char(36) primary key not null,
   image_url varchar(255),
-  team varchar(50),
   birth varchar(20),
   gender tinyint(1),
   country varchar(50),
-  visible tinyint(1) default 1,
   constraint fk_users_player_profile foreign key (user_id) references users(id) on delete cascade
+);
+
+create table if not exists teams (
+  team_id char(36) default (UUID()),
+  owner_id char(36) not null,
+  name varchar(50) not null,
+  image_url varchar(255),
+  description text,
+  constraint fk_users_teams foreign key (owner_id) references users(id)
 );
