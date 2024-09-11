@@ -20,13 +20,13 @@ import SheetCreate from "components/sheet/SheetCreate";
 import dayjs from "dayjs";
 import RoundCreate from "components/round/RoundCreate";
 import RoundView from "./RoundView";
-import { requestFetch, useDataLoader } from "App";
+// import { requestFetch, useDataLoader } from "App";
 import { useRounds, useSheets } from "utils/context";
 import { requestPost } from "utils/fetch";
 import { URL } from "constants/url";
 
 const SheetView = ({ sheet, setSheet }) => {
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const [sheets] = useSheets();
   const [rounds] = useRounds();
   const [sheetRounds, setSheetRounds] = useState([]);
@@ -48,7 +48,7 @@ const SheetView = ({ sheet, setSheet }) => {
     const response = await requestPost(URL.DELETE_SHEET, requestOptions);
     if (response.status === 200) {
       setSheet(null);
-      loadData();
+      // loadData();
     }
   };
 

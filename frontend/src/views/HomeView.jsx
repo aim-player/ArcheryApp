@@ -7,7 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useUser } from "utils/context";
-import { requestFetch, useDataLoader } from "App";
+// import { requestFetch, useDataLoader } from "App";
+import { requestFetch } from "App";
 import { useEffect, useState } from "react";
 
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -17,11 +18,11 @@ import PlayerProfileView from "./PlayerProfileView";
 
 const HomeView = () => {
   const [user] = useUser();
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const [openPlayerProfile, setOpenPlayerProfile] = useState(false);
 
   useEffect(() => {
-    if (user) loadData();
+    // if (user) loadData();
   }, []);
   return (
     <Box>
@@ -65,7 +66,7 @@ const HomeView = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {/* <Avatar /> */}
             <Typography sx={{ fontWeight: "bold" }}>
-              로그인이 필요해요.
+              로그인
             </Typography>
           </Box>
           <KeyboardArrowRightIcon fontSize="large" />

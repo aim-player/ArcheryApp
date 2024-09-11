@@ -20,13 +20,13 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { useDataLoader } from "App";
+// import { useDataLoader } from "App";
 import { usePlaces, useSheets } from "utils/context";
 import { requestGet, requestPost } from "utils/fetch";
 import { URL } from "constants/url";
 
 const SheetCreate = ({ close, editTarget }) => {
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const [sheets] = useSheets();
   const [places, setPlaces] = usePlaces();
   const [popup, setPopup] = useState({ places: false, addPlace: false });
@@ -108,7 +108,7 @@ const SheetCreate = ({ close, editTarget }) => {
     };
     const response = await requestPost(URL.ADD_SHEET, requestOptions);
     if (response.status === 200) {
-      loadData();
+      // loadData();
       close();
     }
     // setSheet(newSheet);
@@ -129,7 +129,7 @@ const SheetCreate = ({ close, editTarget }) => {
     };
     const response = await requestPost(URL.UPDATE_SHEET, requestOptions);
     if (response.status === 200) {
-      loadData();
+      // loadData();
       close();
     }
     // requestFetch("update_sheet", updatedSheet);

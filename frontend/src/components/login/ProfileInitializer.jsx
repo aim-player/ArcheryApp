@@ -54,12 +54,11 @@ const ProfileInitializer = () => {
       }));
       return;
     }
-    // const data = await addProfile(inputs);
     const requestOptions = {
       data: inputs,
     };
     const response = await requestPost(URL.ADD_PROFILE, requestOptions);
-    if (response.status) {
+    if (response.status === 200) {
       setUser((state) => ({ ...state, ...response.data }));
       navigate("/");
     }

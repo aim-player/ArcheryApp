@@ -3,13 +3,13 @@ import { Box, Button, List, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
-import { requestFetch, useDataLoader } from "App";
+// import { requestFetch, useDataLoader } from "App";
 import { requestPost } from "utils/fetch";
 import { URL } from "constants/url";
-import { useEnds, useRounds } from "utils/context";
+import { useEnds } from "utils/context";
 
 const RoundCreate = ({ sheet, editTarget, close }) => {
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const [ends] = useEnds();
   const [inputs, setInputs] = useState({
     distance: DISTANCE[3],
@@ -37,7 +37,7 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     };
     const response = await requestPost(URL.ADD_ROUND, requestOptions);
     if (response.status === 200) {
-      loadData();
+      // loadData();
       close();
     }
     // const newRound = {
@@ -77,7 +77,7 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     };
     const response = await requestPost(URL.UPDATE_END_ALL, requestOptions);
     if (response.status === 200) {
-      loadData();
+      // loadData();
     }
   };
   const updateRound = async () => {
@@ -92,7 +92,7 @@ const RoundCreate = ({ sheet, editTarget, close }) => {
     await updateEnds();
 
     if (response.status === 200) {
-      loadData();
+      // loadData();
       close();
     }
     // const rounds = appData.rounds ? appData.rounds: {};

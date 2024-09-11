@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { URL } from "constants/url";
 import { useUser } from "utils/context";
 import { requestGet } from "utils/fetch";
@@ -33,7 +33,26 @@ const View = () => {
     }
   };
   return (
-    <div>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box sx={{ flex: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottom: "2px solid #000",
+            p: 1,
+          }}
+        >
+          <Typography variant="h5">설정</Typography>
+        </Box>
+      </Box>
       {/* <Box>
         <span>앱 데이터 크기</span>
         <span>{appData.fileSize ? appData.fileSize + "bytes" : "0bytes"}</span>
@@ -41,10 +60,17 @@ const View = () => {
           초기화
         </Button>
       </Box> */}
-      <Button variant="contained" onClick={handleLogOut}>
-        로그아웃
-      </Button>
-    </div>
+      <Box sx={{ p: 1 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={handleLogOut}
+          sx={{ p: 1 }}
+        >
+          로그아웃
+        </Button>
+      </Box>
+    </Box>
   );
 };
 export default View;

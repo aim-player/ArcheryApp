@@ -7,14 +7,14 @@ import {
   useUser,
 } from "utils/context";
 import { useEffect, useRef } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 
 import MainView from "./views/MainView";
 import theme from "./utils/theme";
 import "./App.css";
-import { refreshSession, requestGet, requestLogin } from "utils/fetch";
+import { refreshSession, requestLogin } from "utils/fetch";
 import ProfileInitializer from "components/login/ProfileInitializer";
 import { URL } from "constants/url";
 import { CustomAlert, CustomConfirm } from "components/Components";
@@ -27,9 +27,8 @@ export const requestFetch = (type, payload) => {
 };
 const messageTypes = ["load", "add_sheet", "alert", "login/success"];
 function App() {
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const initialized = useRef(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useUser();
   const [, setSheets] = useSheets();
@@ -98,12 +97,12 @@ function App() {
       if (!role || !name) navigate(URL.PROFILE_INIT);
       else {
         if (!initialized.current) {
-          loadData();
+          // loadData();
           initialized.current = true;
         }
       }
     }
-  }, [user, location]);
+  }, [user]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -129,24 +128,4 @@ export const sendConsoleLog = (text) => {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({ type: "log", data: text })
     );
-};
-
-export const useDataLoader = () => {
-  const [user] = useUser();
-  const [, setSheets] = useSheets();
-  const [, setRounds] = useRounds();
-  const [, setEnds] = useEnds();
-
-  const loadData = async () => {
-    if (!user) return;
-    const response = await requestGet(URL.GET_USERDATA);
-    if (response.status === 200) {
-      const { sheets, rounds, ends } = response.data;
-      setSheets(sheets);
-      setRounds(rounds);
-      setEnds(ends);
-    }
-  };
-
-  return loadData;
 };

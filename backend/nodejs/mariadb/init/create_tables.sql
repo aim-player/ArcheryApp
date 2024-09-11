@@ -56,6 +56,7 @@ create table if not exists player_profile (
   birth varchar(20),
   gender tinyint(1),
   country varchar(50),
+  visible tinyint(1),
   constraint fk_users_player_profile foreign key (user_id) references users(id) on delete cascade
 );
 

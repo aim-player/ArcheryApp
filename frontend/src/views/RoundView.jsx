@@ -26,7 +26,7 @@ import BackspaceIcon from "@mui/icons-material/Backspace";
 
 import RoundCreate from "components/round/RoundCreate";
 import { SCORE_COLOR } from "constants/rule";
-import { requestFetch, useDataLoader } from "App";
+// import { requestFetch, useDataLoader } from "App";
 import RoundStats from "components/round/RoundStats";
 import { useEnds, useRounds } from "utils/context";
 import { requestPost } from "utils/fetch";
@@ -40,7 +40,7 @@ const ButtonPad = [
 ];
 
 const RoundView = ({ sheet, round, setRound, close }) => {
-  const loadData = useDataLoader();
+  // const loadData = useDataLoader();
   const [rounds] = useRounds();
   const [ends] = useEnds();
   const [roundEnds, setRoundEnds] = useState([]);
@@ -72,7 +72,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     const response = await requestPost(URL.DELETE_ROUND, requestOptions);
     if (response.status === 200) {
       setRound(null);
-      loadData();
+      // loadData();
     }
   };
   const addEnd = async (scores) => {
@@ -86,7 +86,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     if (response.status === 200) {
       setCurrentEnd(null);
       setOpenEditor(false);
-      loadData();
+      // loadData();
     }
     // if (currentEnd) {
     //   round.ends = round.ends.map((e) => {
@@ -119,7 +119,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     };
     const response = await requestPost(URL.UPDATE_END, requestOptions);
     if (response.status === 200) {
-      loadData();
+      // loadData();
       setCurrentEnd(null);
       setOpenEditor(false);
     }
