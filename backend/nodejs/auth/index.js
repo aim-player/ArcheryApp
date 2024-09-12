@@ -24,7 +24,7 @@ const authenticateUser = async (req, res) => {
             userInfo,
             expiry_date: exp * 1000,
           }),
-          { httpOnly: true }
+          { httpOnly: true, sameSite: 'None' }
         )
         .json({ userInfo });
       break;
@@ -61,7 +61,7 @@ const createUser = async (platform, email) => {
 
 const validateSession = (req, res, next) => {
   const { session } = req.cookies;
-  if (!session) return res.send(null);
+  if (!session) return res.status(400).send(null);
 
   req.session = JSON.parse(session);
   req.userInfo = JSON.parse(session).userInfo;
