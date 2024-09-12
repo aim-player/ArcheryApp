@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useConfirm, useUser } from "utils/context";
-import { addProfile, requestGet, requestPost } from "utils/fetch";
+import { requestGet, requestPost } from "utils/fetch";
 import { useEffect, useState } from "react";
 import { URL } from "constants/url";
 import { useNavigate } from "react-router-dom";

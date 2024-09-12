@@ -15,10 +15,11 @@ import { URL } from "constants/url";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/ko";
-import { useUser } from "utils/context";
+import { useAlert, useUser } from "utils/context";
 import dayjs from "dayjs";
 const View = ({ close }) => {
-  const [user] = useUser();
+  const [, setAlert] = useAlert();
+  const [user, setUser] = useUser();
   const [currentProfile, setCurrentProfile] = useState({
     name: "",
     team: "",
@@ -29,6 +30,7 @@ const View = ({ close }) => {
     visible: 0,
   });
   const [inputs, setInputs] = useState({
+    name: "",
     team: "",
     birth: "",
     gender: "",
@@ -37,14 +39,17 @@ const View = ({ close }) => {
     visible: 0,
   });
   const getPlayerProfile = async () => {
-    const response = await requestGet(URL.GET_PLAYER_PROFILE);
+    const response = await requestGet(URL.GET_PROFILE);
     let profile = {
       name: user.name,
     };
     if (response.status === 200) {
       const { player_profile } = response.data;
       if (player_profile) {
-        profile = { ...profile, ...player_profile };
+        for (let key in player_profile) {
+          profile[key] =
+            player_profile[key] === "null" ? "" : player_profile[key];
+        }
       }
     }
     setInputs((state) => ({ ...state, ...profile }));
@@ -70,18 +75,28 @@ const View = ({ close }) => {
     return hasDiff;
   };
   const handleSubmit = async () => {
-    if (!validateForm()) return;
-    const { name, ...rest } = inputs;
-    const requestOptions = {
-      data: rest,
-    };
-    const response = await requestPost(
-      URL.UPDATE_PLAYER_PROFILE,
-      requestOptions
-    );
-    if (response.status === 200) {
-      alert("프로필을 저장했어요.");
-      close();
+    let response;
+    try {
+      if (!validateForm()) return;
+      const { name, ...rest } = inputs;
+      const requestOptions = {
+        data: rest,
+      };
+      response = await requestPost(URL.UPDATE_PLAYER_PROFILE, requestOptions);
+      response = await requestPost(URL.UPDATE_USER_NAME, { data: { name } });
+      if (response.status === 200) setUser((state) => ({ ...state, name }));
+      setAlert({
+        active: true,
+        message: "프로필을 저장했어요.",
+        callbackFn: close,
+      });
+    } catch (err) {
+      console.error("Update Player Profile Error: ", err);
+      setAlert({
+        active: true,
+        message: "프로필 저장에 실패했어요.",
+        callbackFn: close,
+      });
     }
   };
   useEffect(() => {
@@ -189,7 +204,7 @@ const View = ({ close }) => {
                 </Grid>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    value={inputs.birth ? dayjs(inputs.birth) : null}
+                    value={inputs.birth ? dayjs(inputs.birth) : dayjs()}
                     format="YYYY/MM/DD"
                     adapterLocale="ko"
                     onChange={(e) =>

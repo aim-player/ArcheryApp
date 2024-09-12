@@ -7,8 +7,10 @@ console.log("ENV TEST: ", process.env.TEST)
 
 const { authenticateUser, validateSession, refreshSession } = require("./auth");
 const {
+  upateUserName,
   addProfile,
   addSheet,
+  getUserProfile,
   getUserData,
   addRound,
   addEnd,
@@ -49,7 +51,9 @@ app.post("/login/oauth", authenticateUser);
 app.get("/refresh_session", refreshSession);
 
 // User
+app.post("/user/name", validateSession, upateUserName);
 app.post("/user/profile", validateSession, addProfile);
+app.get("/user/profile", validateSession, getUserProfile);
 app.get("/user/data", validateSession, getUserData);
 app.get("/user/places", validateSession, getPlaces);
 

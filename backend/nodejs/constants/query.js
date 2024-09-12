@@ -2,6 +2,7 @@ const QUERY = {
   GET_USER: "select * from users where platform=? and email=?",
   CREATE_USER:
     "insert into users (id, platform, email) values (?, ?,?) returning *",
+  UPDATE_USER_NAME: "update users set name=? where id=?",
 
   GET_PLAYER_PROFILE: "select * from player_profile where user_id=?",
   ADD_PROFILE: "update users set role=?, name=? where email=?",

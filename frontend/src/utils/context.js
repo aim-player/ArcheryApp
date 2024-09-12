@@ -9,7 +9,7 @@ export const ContextProvider = ({ children }) => {
   const ends = useState([]);
   const places = useState([]);
   const popup = useState({ login: false });
-  const alert = useState({ active: false, message: "" });
+  const alert = useState({ active: false, message: "", callbackFn: null });
   const confirm = useState({ active: false, messsage: "", callbackFn: null });
   return (
     <Context.Provider

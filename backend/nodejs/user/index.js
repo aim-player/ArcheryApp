@@ -2,6 +2,41 @@ const { QUERY } = require("../constants/query");
 const { pool } = require("../mariadb");
 const { v4 } = require("uuid");
 
+const getUserProfile = async (req, res) => {
+  let conn;
+  try {
+    const { id, role, platform, email } = req.userInfo;
+    conn = await pool.getConnection();
+    const payload = {};
+    const row = await conn.query(QUERY.GET_USER, [platform, email]);
+    payload.user = row[0];
+    if (role === 1) {
+      const row = await conn.query(QUERY.GET_PLAYER_PROFILE, [id]);
+      payload.player_profile = row[0];
+    }
+    res.json(payload);
+  } catch (err) {
+    console.error("Get UserProfile Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const upateUserName = async (req, res) => {
+  let conn;
+  try {
+    const { id } = req.userInfo;
+    const { name } = req.body;
+    conn = await pool.getConnection();
+    await conn.query(QUERY.UPDATE_USER_NAME, [name, id]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Update UserName Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 const getUserData = async (req, res) => {
   let conn;
   let rows;
@@ -290,7 +325,7 @@ const getPlayerProfile = async (req, res) => {
 };
 
 const updatePlayerProfile = async (req, res) => {
-  let conn;
+  let conn, query;
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
@@ -306,7 +341,7 @@ const updatePlayerProfile = async (req, res) => {
       }
       if (queryString.length > 0) {
         queryString = queryString.join(",");
-        const query = `update player_profile set ${queryString} where user_id='${id}'`;
+        query = `update player_profile set ${queryString} where user_id='${id}'`;
         await conn.query(query);
       }
     } else {
@@ -353,6 +388,8 @@ const getTeam = async (req, res) => {
 };
 
 module.exports = {
+  getUserProfile,
+  upateUserName,
   getUserData,
   getPlaces,
   addProfile,

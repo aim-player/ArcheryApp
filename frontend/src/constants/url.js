@@ -7,6 +7,8 @@ export const URL = {
 
   // API
   // User
+  UPDATE_USER_NAME: "/user/name",
+  GET_PROFILE: "/user/profile",
   ADD_PROFILE: "/user/profile",
   GET_USERDATA: "/user/data",
   GET_PLACES: "/user/places",

@@ -5,11 +5,15 @@ export const CustomAlert = () => {
   const [alert, setAlert] = useAlert();
 
   return (
-    <Dialog open={alert.active}>
-      <Box>{alert.message}</Box>
+    <Dialog open={alert.active} sx={{ "& .MuiPaper-root": { p: 1 } }}>
+      <Box sx={{ p: 1 }}>{alert.message}</Box>
       <Button
+        sx={{ py: 0.5 }}
         variant="contained"
-        onClick={() => setAlert((state) => ({ ...state, active: false }))}
+        onClick={() => {
+          if (alert.callbackFn) alert.callbackFn();
+          setAlert((state) => ({ ...state, active: false }));
+        }}
       >
         확인
       </Button>
