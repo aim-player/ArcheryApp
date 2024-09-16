@@ -48,8 +48,8 @@ const getUserData = async (req, res) => {
     rows = await conn.query(QUERY.GET_SHEETS, [id]);
     payload.sheets = rows;
 
-    rows = await conn.query(QUERY.GET_ROUNDS, [id]);
-    payload.rounds = rows;
+    rows = await conn.query(QUERY.GET_TRAINS, [id]);
+    payload.trains = rows;
 
     rows = await conn.query(QUERY.GET_ENDS, [id]);
     payload.ends = rows;
@@ -70,6 +70,52 @@ const getPlaces = async (req, res) => {
     res.json({ places: rows });
   } catch (err) {
     console.error("Get Places Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const getTrain = async (req, res) => {
+  let conn;
+  try {
+    const { id } = req.userInfo;
+    const { train_id } = req.query;
+    conn = await pool.getConnection();
+    const rows = await conn.query(QUERY.GET_TRAIN, [id, train_id]);
+    res.json({ train: rows[0] });
+  } catch (err) {
+    console.error("Get Train Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const getTrains = async (req, res) => {
+  let conn;
+  try {
+    const { id } = req.userInfo;
+    conn = await pool.getConnection();
+    const rows = await conn.query(QUERY.GET_TRAINS, [id]);
+    res.json({ trains: rows });
+  } catch (err) {
+    console.error("Get Trains Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const getEnds = async (req, res) => {
+  let conn;
+  try {
+    const { id } = req.userInfo;
+    const { train_id } = req.query;
+    conn = await pool.getConnection();
+    const rows = await conn.query(QUERY.GET_ENDS, [id, train_id]);
+    res.json({ ends: rows });
+  } catch (err) {
+    console.error("Get Ends Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -116,22 +162,22 @@ const addSheet = async (req, res) => {
     if (conn) conn.release();
   }
 };
-const addRound = async (req, res) => {
+const addTrain = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
-    const { sheet_id, distance, arrowCount, endCount } = req.body;
-    const rows = await conn.query(QUERY.ADD_ROUND, [
+    const { distance, arrowCount, endCount, place } = req.body;
+    const rows = await conn.query(QUERY.ADD_TRAIN, [
       id,
-      sheet_id,
       distance,
       arrowCount,
       endCount,
+      place,
     ]);
     res.json(rows[0]);
   } catch (err) {
-    console.error("Add Round Error: ", err);
+    console.error("Add Train Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -142,15 +188,15 @@ const addEnd = async (req, res) => {
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
-    const { round_id, scores } = req.body;
+    const { train_id, scores } = req.body;
     const rows = await conn.query(QUERY.ADD_END, [
       id,
-      round_id,
+      train_id,
       JSON.stringify(scores),
     ]);
     res.json(rows[0]);
   } catch (err) {
-    console.error("Add Round Error: ", err);
+    console.error("Add Train Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -165,7 +211,7 @@ const addPlace = async (req, res) => {
     const rows = await conn.query(QUERY.ADD_PLACE, [id, name]);
     res.json(rows[0]);
   } catch (err) {
-    console.error("Add Round Error: ", err);
+    console.error("Add Train Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -195,22 +241,22 @@ const updateSheet = async (req, res) => {
     if (conn) conn.release();
   }
 };
-const updateRound = async (req, res) => {
+const updateTrain = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
-    const { round_id, distance, arrowCount, endCount } = req.body;
-    await conn.query(QUERY.UPDATE_ROUND, [
+    const { train_id, distance, arrowCount, endCount } = req.body;
+    await conn.query(QUERY.UPDATE_TRAIN, [
       distance,
       arrowCount,
       endCount,
-      round_id,
+      train_id,
       id,
     ]);
     res.sendStatus(200);
   } catch (err) {
-    console.error("update Round Error: ", err);
+    console.error("update Train Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -276,13 +322,13 @@ const deleteSheet = async (req, res) => {
   }
 };
 
-const deleteRound = async (req, res) => {
+const deleteTrain = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
-    const { round_id } = req.body;
-    await conn.query(QUERY.DELETE_ROUND, [round_id, id]);
+    const { train_id } = req.body;
+    await conn.query(QUERY.DELETE_TRAIN, [train_id, id]);
     res.sendStatus(200);
   } catch (err) {
     console.error("Delete Sheet Error: ", err);
@@ -392,16 +438,19 @@ module.exports = {
   upateUserName,
   getUserData,
   getPlaces,
+  getTrain,
+  getTrains,
+  getEnds,
   addProfile,
   addSheet,
-  addRound,
+  addTrain,
   addEnd,
   addPlace,
   deleteSheet,
-  deleteRound,
+  deleteTrain,
   deletePlace,
   updateSheet,
-  updateRound,
+  updateTrain,
   updateEnd,
   updateEnds,
   getPlayerProfile,

@@ -9,7 +9,7 @@ import { LineChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
-const RoundStats = ({ close, round }) => {
+const TrainStats = ({ close, train }) => {
   const [endScores, setEndScores] = useState([]);
   const convertChartData = () => {
     const convertScore = (score) => {
@@ -18,7 +18,7 @@ const RoundStats = ({ close, round }) => {
       return score;
     };
 
-    const data = round.ends.map((end) => {
+    const data = train.ends.map((end) => {
       let score = 0;
       end.data.forEach((s) => {
         if (s) score += convertScore(s);
@@ -29,7 +29,7 @@ const RoundStats = ({ close, round }) => {
     setEndScores(data);
   };
   useEffect(() => {
-    if (round.ends) {
+    if (train.ends) {
       convertChartData();
     }
   }, []);
@@ -110,4 +110,4 @@ const RoundStats = ({ close, round }) => {
   );
 };
 
-export default RoundStats;
+export default TrainStats;

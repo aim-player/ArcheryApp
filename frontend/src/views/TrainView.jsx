@@ -24,13 +24,13 @@ import AddIcon from "@mui/icons-material/Add";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 
-import RoundCreate from "components/round/RoundCreate";
+import TrainCreate from "components/train/TrainCreate";
 import { SCORE_COLOR } from "constants/rule";
-// import { requestFetch, useDataLoader } from "App";
-import RoundStats from "components/round/RoundStats";
-import { useEnds, useRounds } from "utils/context";
-import { requestPost } from "utils/fetch";
+import TrainStats from "components/train/TrainStats";
+import { useAlert, useEnds, useTrains } from "utils/context";
+import { requestGet, requestPost } from "utils/fetch";
 import { URL } from "constants/url";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ButtonPad = [
   ["X", 10, "M", "ERASE"],
@@ -39,11 +39,13 @@ const ButtonPad = [
   [3, 2, 1],
 ];
 
-const RoundView = ({ sheet, round, setRound, close }) => {
-  // const loadData = useDataLoader();
-  const [rounds] = useRounds();
+const TrainView = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [, setAlert] = useAlert();
+  const [train, setTrain] = useState({});
   const [ends] = useEnds();
-  const [roundEnds, setRoundEnds] = useState([]);
+  const [trainEnds, setTrainEnds] = useState([]);
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
   const [currentEnd, setCurrentEnd] = useState();
@@ -51,50 +53,41 @@ const RoundView = ({ sheet, round, setRound, close }) => {
   const [openEditor, setOpenEditor] = useState(false);
   const [openStats, setOpenStats] = useState(false);
 
-  const generateEndId = () => {
-    let id = 1;
-    if (round.ends && round.ends.length > 0) {
-      round.ends.forEach((r) => {
-        if (r.id >= id) id = r.id + 1;
-      });
-    }
-    return id;
-  };
   const editRound = () => {
-    setEditTarget(round);
+    setEditTarget(train);
     setAnchorEl(null);
   };
   const deleteRound = async () => {
     if (!window.confirm("이 라운드를 삭제할까요?")) return;
     const requestOptions = {
-      data: { round_id: round.id },
+      data: { train_id: train },
     };
-    const response = await requestPost(URL.DELETE_ROUND, requestOptions);
+    const response = await requestPost(URL.DELETE_TRAIN, requestOptions);
     if (response.status === 200) {
-      setRound(null);
+      // setRound(null);
       // loadData();
     }
   };
   const addEnd = async (scores) => {
-    if (!currentEnd && roundEnds.length >= round.end_count) return;
+    if (!currentEnd && trainEnds.length >= train.end_count) return;
 
     const requestOptions = {
-      data: { round_id: round.id, scores },
+      data: { train_id: train.id, scores },
     };
 
     const response = await requestPost(URL.ADD_END, requestOptions);
     if (response.status === 200) {
       setCurrentEnd(null);
       setOpenEditor(false);
-      // loadData();
+      getEnds();
     }
     // if (currentEnd) {
-    //   round.ends = round.ends.map((e) => {
+    //   train.ends = train.ends.map((e) => {
     //     if (currentEnd.id === e.id) e.data = end;
     //     return e;
     //   });
-    //   sheet.rounds = sheet.rounds.map((r) => {
-    //     if (r.id === round.id) r.ends = round.ends;
+    //   sheet.trains = sheet.trains.map((r) => {
+    //     if (r.id === train.id) r.ends = train.ends;
     //     return r;
     //   });
     // } else {
@@ -102,9 +95,9 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     //     id: generateEndId(),
     //     data: end,
     //   };
-    //   round.ends = round.ends ? [...round.ends, newEnd] : [newEnd];
-    //   sheet.rounds = sheet.rounds.map((r) => {
-    //     if (r.id === round.id) r.ends = round.ends;
+    //   train.ends = train.ends ? [...train.ends, newEnd] : [newEnd];
+    //   sheet.trains = sheet.trains.map((r) => {
+    //     if (r.id === train.id) r.ends = train.ends;
     //     return r;
     //   });
     // }
@@ -125,17 +118,49 @@ const RoundView = ({ sheet, round, setRound, close }) => {
     }
   };
 
+  const getTrain = async () => {
+    if (!location.state || !location.state.id) {
+      setAlert({
+        active: true,
+        message: "훈련을 선택해주세요",
+        callbackFn: () => navigate(URL.TRAINS),
+      });
+      return;
+    }
+    const requestOptions = {
+      params: { train_id: location.state.id },
+    };
+    const response = await requestGet(URL.GET_TRAIN, requestOptions);
+    if (response.status === 200) {
+      const { train } = response.data;
+      setTrain(train);
+    }
+  };
+
+  const getEnds = async () => {
+    if (!train || !train.id) return;
+    const requestOptions = {
+      params: { train_id: train.id },
+    };
+    const response = await requestGet(URL.GET_ENDS, requestOptions);
+    console.log("Get Train Ends: ", response);
+    if (response.status === 200) {
+      const { ends } = response.data;
+      if (ends) setTrainEnds(ends);
+    }
+  };
+
   useEffect(() => {
-    const roundEnds = ends.filter((e) => e.round_id === round.id);
-    setRoundEnds(roundEnds);
+    getTrain();
+  }, []);
+  useEffect(() => {
+    // const trainEnds = ends.filter((e) => e.train_id === train.id);
+    // setTrainEnds(trainEnds);
   }, [ends]);
 
   useEffect(() => {
-    if (round) {
-      const updatedRound = rounds.find((r) => r.id === round.id);
-      if (updatedRound) setRound(updatedRound);
-    }
-  }, [rounds]);
+    if (train) getEnds();
+  }, [train]);
   return (
     <Box
       sx={{
@@ -153,7 +178,11 @@ const RoundView = ({ sheet, round, setRound, close }) => {
       <DialogTitle
         sx={{ display: "flex", justifyContent: "space-between", p: 1 }}
       >
-        <Button variant="contained" sx={{ p: 1 }} onClick={close}>
+        <Button
+          variant="contained"
+          sx={{ p: 1 }}
+          onClick={() => navigate(URL.TRAINS)}
+        >
           <ArrowBackIcon />
         </Button>
         <ButtonGroup
@@ -172,8 +201,8 @@ const RoundView = ({ sheet, round, setRound, close }) => {
       </DialogTitle>
       <Box sx={{ border: "1px solid #ccc", height: "100%" }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1 }}>
-          {roundEnds &&
-            roundEnds.map((end, endIndex) => (
+          {trainEnds &&
+            trainEnds.map((end, endIndex) => (
               <MenuItem
                 key={`end_${endIndex}`}
                 onClick={() => {
@@ -183,7 +212,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  height: (round.arrow_count / 3) * 50,
+                  height: (train.arrow_count / 3) * 50,
                   border: "1px solid #ccc",
                   padding: 0,
                 }}
@@ -206,7 +235,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                       container
                       sx={{ flex: 1, display: "flex", height: "100%" }}
                     >
-                      {Array(round.arrow_count)
+                      {Array(train.arrow_count)
                         .fill(null)
                         .map((_, scoreIndex) => {
                           const scores = JSON.parse(end.scores);
@@ -242,7 +271,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                       }}
                     >
                       {Array.from({
-                        length: Math.ceil(round.arrow_count / 3),
+                        length: Math.ceil(train.arrow_count / 3),
                       }).map((_, index) => {
                         const sum = JSON.parse(end.scores)
                           .slice(index * 3, index * 3 + 3)
@@ -291,7 +320,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 )}
               </MenuItem>
             ))}
-          {(!roundEnds || roundEnds.length < round.end_count) && (
+          {(!trainEnds || trainEnds.length < train.end_count) && (
             <MenuItem
               onClick={() => {
                 setCurrentEnd(null);
@@ -300,7 +329,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                height: (round.arrow_count / 3) * 50,
+                height: (train.arrow_count / 3) * 50,
                 border: "1px solid #ccc",
                 padding: 0,
               }}
@@ -319,7 +348,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 E0
               </Box>
               <Grid container sx={{ flex: 1, height: "100%" }}>
-                {Array(round.arrow_count)
+                {Array(train.arrow_count)
                   .fill(null)
                   .map((score, scoreIndex) => (
                     <Grid
@@ -349,7 +378,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
                 }}
               >
                 {Array.from({
-                  length: Math.ceil(round.arrow_count / 3),
+                  length: Math.ceil(train.arrow_count / 3),
                 }).map((_, index) => {
                   return (
                     <Grid
@@ -381,7 +410,7 @@ const RoundView = ({ sheet, round, setRound, close }) => {
             </MenuItem>
           )}
         </Box>
-        {(!roundEnds || roundEnds.length < round.end_count) && (
+        {(!trainEnds || trainEnds.length < train.end_count) && (
           <Button
             variant="contained"
             sx={{
@@ -411,10 +440,10 @@ const RoundView = ({ sheet, round, setRound, close }) => {
         <MenuItem onClick={deleteRound}>라운드 삭제</MenuItem>
       </Menu>
       {editTarget && (
-        <RoundCreate
-          sheet={sheet}
+        <TrainCreate
+          // sheet={sheet}
           close={() => setEditTarget(null)}
-          setRound={setRound}
+          // setRound={setRound}
           editTarget={editTarget}
         />
       )}
@@ -430,23 +459,23 @@ const RoundView = ({ sheet, round, setRound, close }) => {
         fullWidth
       >
         <ScoreEditor
-          round={round}
+          train={train}
           end={currentEnd}
           addEnd={addEnd}
           editEnd={editEnd}
         />
       </Dialog>
       <Dialog open={openStats} onClose={() => setOpenStats(false)} fullScreen>
-        <RoundStats round={round} close={() => setOpenStats(false)} />
+        <TrainStats train={train} close={() => setOpenStats(false)} />
       </Dialog>
     </Box>
   );
 };
 
-export default RoundView;
+export default TrainView;
 
-const ScoreEditor = ({ round, end, addEnd, editEnd }) => {
-  const [scores, setScores] = useState(Array(round.arrow_count).fill(null));
+const ScoreEditor = ({ train, end, addEnd, editEnd }) => {
+  const [scores, setScores] = useState(Array(train.arrow_count).fill(null));
 
   const applyEnd = () => {
     setScores(JSON.parse(end.scores));

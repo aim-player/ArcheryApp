@@ -1,11 +1,5 @@
 import { CssBaseline, Container, ThemeProvider } from "@mui/material";
-import {
-  useEnds,
-  usePlaces,
-  useRounds,
-  useSheets,
-  useUser,
-} from "utils/context";
+import { usePlaces, useSheets, useUser } from "utils/context";
 import { useEffect, useRef } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -18,6 +12,11 @@ import { refreshSession, requestLogin } from "utils/fetch";
 import ProfileInitializer from "components/login/ProfileInitializer";
 import { URL } from "constants/url";
 import { CustomAlert, CustomConfirm } from "components/Components";
+import TrainCreate from "components/train/TrainCreate";
+import TrainView from "views/TrainView";
+import TrainsView from "views/TrainsView";
+import SettingView from "views/SettingView";
+import CustomBottomNavigation from "components/CustomBottomNavigation";
 
 dayjs.locale("ko");
 
@@ -108,12 +107,26 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container
-        sx={{ "&.MuiContainer-root": { maxWidth: "100%", padding: 0 } }}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          "&.MuiContainer-root": { padding: 0 },
+        }}
       >
         <Routes>
           <Route path="/" element={<MainView />} />
           <Route path={URL.PROFILE_INIT} element={<ProfileInitializer />} />
+          <Route path={URL.ADD_TRAIN} element={<TrainCreate />} />
+          <Route path={URL.TRAINS} element={<TrainsView />} />
+          <Route path={URL.TRAIN} element={<TrainView />} />
+          <Route path={URL.SETTING} element={<SettingView />} />
         </Routes>
+        <CustomBottomNavigation />
       </Container>
       <CustomAlert />
       <CustomConfirm />

@@ -4,23 +4,28 @@ import AddIcon from "@mui/icons-material/Add";
 
 import SheetCreate from "components/sheet/SheetCreate";
 import SheetView from "./SheetView";
-import { useSheets } from "utils/context";
-// import { useDataLoader } from "App";
+import { requestGet } from "utils/fetch";
+import { URL } from "constants/url";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 
-const SheetsView = () => {
-  // const loadData = useDataLoader();
-  const [sheets] = useSheets();
+const TrainsView = () => {
+  const navigate = useNavigate();
+  const [trains, setTrains] = useState([]);
   const [open, setOpen] = useState(false);
   const [sheet, setSheet] = useState();
-
+  
+  const getTrains = async () => {
+    const response = await requestGet(URL.GET_TRAINS);
+    console.log("response: ", response);
+    if (response.status === 200) {
+      const { trains } = response.data;
+      setTrains(trains);
+    }
+  };
   useEffect(() => {
-    if (sheet) setSheet(sheets.find((s) => s.id === sheet.id));
-  }, [sheets]);
-
-  useEffect(() => {
-    // loadData();
+    getTrains();
   }, []);
-
   return (
     <Box
       sx={{
@@ -38,7 +43,7 @@ const SheetsView = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Typography variant="h5">기록시트</Typography>
+        <Typography variant="h5">훈련기록</Typography>
         <Button
           variant="contained"
           sx={{ width: 40, height: 40 }}
@@ -47,7 +52,7 @@ const SheetsView = () => {
           <AddIcon />
         </Button>
       </Box>
-      {sheets.length > 0 ? (
+      {trains.length > 0 ? (
         <Box
           sx={{
             flex: 1,
@@ -57,13 +62,13 @@ const SheetsView = () => {
             overflowY: "auto",
           }}
         >
-          {sheets.map((sheet, index) => (
+          {trains.map((train, index) => (
             <MenuItem
-              key={`sheet_${index}`}
-              onClick={() => setSheet(sheet)}
+              key={`train_${index}`}
+              onClick={() => navigate(URL.TRAIN, { state: { id: train.id } })}
               sx={{ bgcolor: "#f3f3f3" }}
             >
-              {sheet.name}
+              {dayjs(train.create_time).format("YYYY-MM-DD HH:mm")}
             </MenuItem>
           ))}
         </Box>
@@ -104,4 +109,4 @@ const SheetsView = () => {
     </Box>
   );
 };
-export default SheetsView;
+export default TrainsView;

@@ -15,8 +15,11 @@ import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PlayerProfileView from "./PlayerProfileView";
+import { useNavigate } from "react-router-dom";
+import { URL } from "constants/url";
 
 const HomeView = () => {
+  const navigate = useNavigate();
   const [user] = useUser();
   // const loadData = useDataLoader();
   const [openPlayerProfile, setOpenPlayerProfile] = useState(false);
@@ -65,9 +68,7 @@ const HomeView = () => {
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {/* <Avatar /> */}
-            <Typography sx={{ fontWeight: "bold" }}>
-              로그인
-            </Typography>
+            <Typography sx={{ fontWeight: "bold" }}>로그인</Typography>
           </Box>
           <KeyboardArrowRightIcon fontSize="large" />
         </MenuItem>
@@ -115,6 +116,7 @@ const HomeView = () => {
             fullWidth
             variant="contained"
             sx={{ p: 1, fontWeight: "bold" }}
+            onClick={() => navigate(URL.ADD_TRAIN)}
           >
             훈련하기
           </Button>

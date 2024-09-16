@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 require("./mariadb");
-console.log("ENV TEST: ", process.env.TEST)
+console.log("ENV TEST: ", process.env.TEST);
 
 const { authenticateUser, validateSession, refreshSession } = require("./auth");
 const {
@@ -12,12 +12,15 @@ const {
   addSheet,
   getUserProfile,
   getUserData,
-  addRound,
+  getTrain,
+  getTrains,
+  addTrain,
+  getEnds,
   addEnd,
   deleteSheet,
-  deleteRound,
+  deleteTrain,
   updateSheet,
-  updateRound,
+  updateTrain,
   updateEnd,
   updateEnds,
   getPlaces,
@@ -66,12 +69,15 @@ app.post("/sheet/add", validateSession, addSheet);
 app.post("/sheet/update", validateSession, updateSheet);
 app.post("/sheet/delete", validateSession, deleteSheet);
 
-// Round
-app.post("/round/add", validateSession, addRound);
-app.post("/round/update", validateSession, updateRound);
-app.post("/round/delete", validateSession, deleteRound);
+// Train
+app.get("/train", validateSession, getTrain);
+app.get("/trains", validateSession, getTrains);
+app.post("/train/add", validateSession, addTrain);
+app.post("/train/update", validateSession, updateTrain);
+app.post("/train/delete", validateSession, deleteTrain);
 
 // End
+app.get("/ends", validateSession, getEnds);
 app.post("/end/add", validateSession, addEnd);
 app.post("/end/update", validateSession, updateEnd);
 app.post("/end/update_all", validateSession, updateEnds);

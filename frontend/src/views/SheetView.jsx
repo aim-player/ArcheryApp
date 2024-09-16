@@ -18,21 +18,21 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useEffect, useState } from "react";
 import SheetCreate from "components/sheet/SheetCreate";
 import dayjs from "dayjs";
-import RoundCreate from "components/round/RoundCreate";
-import RoundView from "./RoundView";
+import TrainCreate from "components/train/TrainCreate";
+import TrainView from "./TrainView";
 // import { requestFetch, useDataLoader } from "App";
-import { useRounds, useSheets } from "utils/context";
+import { useTrains, useSheets } from "utils/context";
 import { requestPost } from "utils/fetch";
 import { URL } from "constants/url";
 
 const SheetView = ({ sheet, setSheet }) => {
   // const loadData = useDataLoader();
   const [sheets] = useSheets();
-  const [rounds] = useRounds();
+  const [trains] = useTrains();
   const [sheetRounds, setSheetRounds] = useState([]);
   const [anchorEl, setAnchorEl] = useState();
   const [editTarget, setEditTarget] = useState();
-  const [round, setRound] = useState();
+  const [train, setRound] = useState();
   const [createRound, setCreateRound] = useState(false);
 
   const editSheet = () => {
@@ -57,16 +57,16 @@ const SheetView = ({ sheet, setSheet }) => {
   };
 
   useEffect(() => {
-    if (sheet && sheet.rounds && round) {
-      const exists = sheet.rounds.find((r) => r.id === round.id);
+    if (sheet && sheet.trains && train) {
+      const exists = sheet.trains.find((r) => r.id === train.id);
       if (exists) setRound(exists);
     }
   }, [sheets]);
 
   useEffect(() => {
-    const sheetRounds = rounds.filter((r) => r.sheet_id === sheet.id);
+    const sheetRounds = trains.filter((r) => r.sheet_id === sheet.id);
     setSheetRounds(sheetRounds);
-  }, [rounds]);
+  }, [trains]);
 
   return (
     <Box
@@ -135,7 +135,7 @@ const SheetView = ({ sheet, setSheet }) => {
           {sheetRounds.map((r, index) => (
             <MenuItem
               onClick={() => setRound(r)}
-              key={`round_${index}`}
+              key={`train_${index}`}
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -197,12 +197,12 @@ const SheetView = ({ sheet, setSheet }) => {
         />
       )}
       {createRound && (
-        <RoundCreate sheet={sheet} close={() => setCreateRound(false)} />
+        <TrainCreate sheet={sheet} close={() => setCreateRound(false)} />
       )}
-      {round && (
-        <RoundView
+      {train && (
+        <TrainView
           sheet={sheet}
-          round={round}
+          train={train}
           setRound={setRound}
           close={() => setRound(null)}
         />

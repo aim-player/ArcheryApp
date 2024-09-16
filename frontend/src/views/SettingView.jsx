@@ -29,7 +29,7 @@ const View = () => {
           );
       }
       setUser(null);
-      window.location.reload();
+      window.location.href = "/";
     }
   };
   return (
@@ -60,16 +60,18 @@ const View = () => {
           초기화
         </Button>
       </Box> */}
-      <Box sx={{ p: 1 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={handleLogOut}
-          sx={{ p: 1 }}
-        >
-          로그아웃
-        </Button>
-      </Box>
+      {user && (
+        <Box sx={{ p: 1 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleLogOut}
+            sx={{ p: 1 }}
+          >
+            로그아웃
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -13,7 +13,7 @@ export const requestGet = async (path, requestOptions = {}) => {
   } catch (err) {
     if (err.response.status === 401) {
       alert("세션이 만료되었어요.\n다시 로그인 해주세요.");
-      window.location.reload();
+      window.location.href = "/";
     }
     console.error(path);
     console.error("Get Request Error: ", err);
@@ -31,7 +31,7 @@ export const requestPost = async (path, requestOptions = {}) => {
   } catch (err) {
     if (err.response.status === 401) {
       alert("세션이 만료되었어요.\n다시 로그인 해주세요.");
-      window.location.reload();
+      window.location.href = "/";
     }
     console.error(path);
     console.error("Post Request Error: ", err);
@@ -46,7 +46,6 @@ export const refreshSession = async () => {
   } catch (err) {
     if (err.response.status === 401) {
       alert("세션이 만료되었어요.\n다시 로그인 해주세요.");
-      window.location.reload();
     }
     console.log("Refresh Session Error: ", err);
   }
@@ -93,7 +92,7 @@ export const addProfile = async (payload) => {
   } catch (err) {
     if (err.response.status === 401) {
       alert("세션이 만료되었어요.\n다시 로그인 해주세요.");
-      window.location.reload();
+      window.location.href = "/";
     }
     console.log("Add Profile Error: ");
     console.log(err);
@@ -108,7 +107,7 @@ export const getUserData = async () => {
   } catch (err) {
     if (err.response.status === 401) {
       alert("세션이 만료되었어요.\n다시 로그인 해주세요.");
-      window.location.reload();
+      window.location.href = "/";
     }
     console.error("Get User Data Error: ", err);
   }

@@ -1,4 +1,7 @@
 export const URL = {
+  HOME: "/",
+  GROUP: "/group",
+  SETTING: "/setting",
   LOGIN_OAUTH: "/login/oauth",
   LOGOUT: "/logout",
   REFRESH_SESSION: "/refresh_session",
@@ -21,12 +24,18 @@ export const URL = {
   UPDATE_SHEET: "/sheet/update",
   DELETE_SHEET: "/sheet/delete",
 
-  // Round
-  ADD_ROUND: "/round/add",
-  UPDATE_ROUND: "/round/update",
-  DELETE_ROUND: "/round/delete",
+  // Train
+  TRAIN: "/train",
+  TRAINS: "/trains",
+
+  GET_TRAIN: "/train",
+  GET_TRAINS: "/trains",
+  ADD_TRAIN: "/train/add",
+  UPDATE_TRAIN: "/train/update",
+  DELETE_TRAIN: "/train/delete",
 
   // End
+  GET_ENDS: "/ends",
   ADD_END: "/end/add",
   UPDATE_END: "/end/update",
   UPDATE_END_ALL: "/end/update_all",

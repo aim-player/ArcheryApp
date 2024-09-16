@@ -24,7 +24,7 @@ const authenticateUser = async (req, res) => {
             userInfo,
             expiry_date: exp * 1000,
           }),
-          { httpOnly: true, sameSite: 'None' }
+          { httpOnly: true, sameSite: "None", secure: true }
         )
         .json({ userInfo });
       break;
@@ -61,7 +61,7 @@ const createUser = async (platform, email) => {
 
 const validateSession = (req, res, next) => {
   const { session } = req.cookies;
-  if (!session) return res.status(400).send(null);
+  if (!session) return res.status(401).send("No Session");
 
   req.session = JSON.parse(session);
   req.userInfo = JSON.parse(session).userInfo;
@@ -74,14 +74,14 @@ const validateSession = (req, res, next) => {
 
 const refreshSession = async (req, res) => {
   const { session } = req.cookies;
-  if (!session) return res.send(null);
+  if (!session) return res.status(401).send("No Session");
 
   req.session = JSON.parse(session);
   req.userInfo = JSON.parse(session).userInfo;
   const expired = req.session.expiry_date < Date.now();
   if (expired) {
     res.clearCookie("session");
-    return res.sendStatus(501);
+    return res.status(401).send("Session Expired");
   } else {
     const userInfo = await getUser(req.userInfo.platform, req.userInfo.email);
     return res.json(userInfo);

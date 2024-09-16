@@ -5,7 +5,7 @@ const Context = createContext();
 export const ContextProvider = ({ children }) => {
   const user = useState();
   const sheets = useState([]);
-  const rounds = useState([]);
+  const trains = useState([]);
   const ends = useState([]);
   const places = useState([]);
   const popup = useState({ login: false });
@@ -13,7 +13,7 @@ export const ContextProvider = ({ children }) => {
   const confirm = useState({ active: false, messsage: "", callbackFn: null });
   return (
     <Context.Provider
-      value={{ user, sheets, rounds, ends, places, popup, alert, confirm }}
+      value={{ user, sheets, trains, ends, places, popup, alert, confirm }}
     >
       {children}
     </Context.Provider>
@@ -30,9 +30,9 @@ export const useSheets = () => {
   return context.sheets;
 };
 
-export const useRounds = () => {
+export const useTrains = () => {
   const context = useContext(Context);
-  return context.rounds;
+  return context.trains;
 };
 
 export const useEnds = () => {
