@@ -8,6 +8,9 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+    networks:
+      - app-network
+      
   mariadb:
     image: mariadb:latest
     container_name: mariadb
@@ -22,6 +25,11 @@ services:
       timeout: 1s
       interval: 3s
       retries: 10
+    networks:
+      - app-network
 volumes:
   archery:
     external: true
+networks:
+  app-network:
+    driver: bridge
