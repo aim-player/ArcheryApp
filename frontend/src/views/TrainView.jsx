@@ -58,14 +58,13 @@ const TrainView = () => {
     setAnchorEl(null);
   };
   const deleteRound = async () => {
-    if (!window.confirm("이 라운드를 삭제할까요?")) return;
+    if (!window.confirm("이 훈련기록을 삭제할까요?")) return;
     const requestOptions = {
-      data: { train_id: train },
+      data: { train_id: train.id },
     };
     const response = await requestPost(URL.DELETE_TRAIN, requestOptions);
     if (response.status === 200) {
-      // setRound(null);
-      // loadData();
+      navigate(URL.TRAINS);
     }
   };
   const addEnd = async (scores) => {
@@ -106,13 +105,14 @@ const TrainView = () => {
   const editEnd = async (scores) => {
     const requestOptions = {
       data: {
+        train_id: train.id,
         end_id: currentEnd.id,
         scores,
       },
     };
     const response = await requestPost(URL.UPDATE_END, requestOptions);
     if (response.status === 200) {
-      // loadData();
+      getEnds();
       setCurrentEnd(null);
       setOpenEditor(false);
     }

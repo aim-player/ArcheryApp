@@ -19,6 +19,8 @@ create table if not exists trains (
   arrow_count int default 6,
   end_count int default 6,
   place varchar(50),
+  total_score int default 0,
+  total_shot int default 0,
   create_time timestamp default current_timestamp
 );
 

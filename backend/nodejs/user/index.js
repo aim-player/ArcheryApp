@@ -2,6 +2,27 @@ const { QUERY } = require("../constants/query");
 const { pool } = require("../mariadb");
 const { v4 } = require("uuid");
 
+const updateTrainStats = async ({ conn, user_id, train_id }) => {
+  const rows = await conn.query(QUERY.GET_ENDS, [user_id, train_id]);
+  if (rows.length > 0) {
+    let total_score = 0;
+    let total_shot = 0;
+
+    rows.forEach((end) => {
+      if (end.scores) {
+        const scores = JSON.parse(end.scores).filter((score) => !!score);
+        total_score += scores.reduce((a, b) => a + b, 0);
+        total_shot += scores.length;
+      }
+    });
+    await conn.query(QUERY.UPDATE_TRAIN_STATS, [
+      total_score,
+      total_shot,
+      train_id,
+      user_id,
+    ]);
+  }
+};
 const getUserProfile = async (req, res) => {
   let conn;
   try {
@@ -194,6 +215,7 @@ const addEnd = async (req, res) => {
       train_id,
       JSON.stringify(scores),
     ]);
+    await updateTrainStats({ conn, user_id: id, train_id });
     res.json(rows[0]);
   } catch (err) {
     console.error("Add Train Error: ", err);
@@ -267,9 +289,10 @@ const updateEnd = async (req, res) => {
   try {
     conn = await pool.getConnection();
     const { id } = req.userInfo;
-    const { end_id, scores } = req.body;
+    const { train_id, end_id, scores } = req.body;
     await conn.query(QUERY.UPDATE_END, [JSON.stringify(scores), end_id, id]);
     res.sendStatus(200);
+    await updateTrainStats({ conn, user_id: id, train_id });
   } catch (err) {
     console.error("update End Error: ", err);
     res.sendStatus(500);

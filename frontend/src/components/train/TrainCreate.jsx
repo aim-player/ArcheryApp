@@ -143,7 +143,7 @@ const TrainCreate = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Button variant="contained" sx={{ p: 1 }} onClick={() => navigate("/")}>
+        <Button variant="contained" sx={{ p: 1 }} onClick={() => navigate(URL.TRAINS)}>
           <ArrowBackIcon />
         </Button>
         <Typography variant="h5">

@@ -17,6 +17,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import PlayerProfileView from "./PlayerProfileView";
 import { useNavigate } from "react-router-dom";
 import { URL } from "constants/url";
+import { requestGet } from "utils/fetch";
 
 const HomeView = () => {
   const navigate = useNavigate();
@@ -73,55 +74,7 @@ const HomeView = () => {
           <KeyboardArrowRightIcon fontSize="large" />
         </MenuItem>
       )}
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ p: 2, border: "1px solid #333", borderRadius: 2 }}>
-          <Typography sx={{ fontSize: 20, fontWeight: "bold", mb: 1 }}>
-            내 기록
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                border: "1px solid #333",
-                p: 1,
-                borderRadius: 2,
-              }}
-            >
-              <Typography sx={{ fontWeight: "bold" }}>총 발수</Typography>
-              <Typography sx={{ fontSize: 20, fontWeight: "bold" }}>
-                0
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                border: "1px solid #333",
-                p: 1,
-                borderRadius: 2,
-              }}
-            >
-              <Typography sx={{ fontWeight: "bold" }}>평균 점수</Typography>
-              <Typography sx={{ fontSize: 20, fontWeight: "bold" }}>
-                0
-              </Typography>
-            </Box>
-          </Box>
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{ p: 1, fontWeight: "bold" }}
-            onClick={() => navigate(URL.ADD_TRAIN)}
-          >
-            훈련하기
-          </Button>
-        </Box>
-      </Box>
+      <TrainLogs />
       <Dialog open={openPlayerProfile} fullScreen>
         <PlayerProfileView close={() => setOpenPlayerProfile(false)} />
       </Dialog>
@@ -129,3 +82,85 @@ const HomeView = () => {
   );
 };
 export default HomeView;
+
+const TrainLogs = () => {
+  const [user] = useUser();
+  const [trains, setTrains] = useState([]);
+  const [stats, setStats] = useState({ totalScore: 0, totalShot: 0 });
+  const navigate = useNavigate();
+
+  const getTrains = async () => {
+    const response = await requestGet(URL.GET_TRAINS);
+    if (response.status === 200) {
+      const { trains } = response.data;
+      setTrains(trains);
+    }
+  };
+
+  const calcStats = () => {
+    const totalScore = trains.reduce(
+      (sum, train) => sum + train.total_score,
+      0
+    );
+    const totalShot = trains.reduce((sum, train) => sum + train.total_shot, 0);
+    setStats({ totalScore, totalShot });
+  };
+  useEffect(() => {
+    if (user) getTrains();
+  }, [user]);
+
+  useEffect(() => {
+    calcStats();
+  }, [trains]);
+  return (
+    <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, border: "1px solid #333", borderRadius: 2 }}>
+        <Typography sx={{ fontSize: 20, fontWeight: "bold", mb: 1 }}>
+          내 기록
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              border: "1px solid #333",
+              p: 1,
+              borderRadius: 2,
+            }}
+          >
+            <Typography sx={{ fontWeight: "bold" }}>총 발수</Typography>
+            <Typography sx={{ fontSize: 20, fontWeight: "bold" }}>
+              {stats.totalShot}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              border: "1px solid #333",
+              p: 1,
+              borderRadius: 2,
+            }}
+          >
+            <Typography sx={{ fontWeight: "bold" }}>평균 점수</Typography>
+            <Typography sx={{ fontSize: 20, fontWeight: "bold" }}>
+              {(stats.totalScore / stats.totalShot).toFixed(2)}
+            </Typography>
+          </Box>
+        </Box>
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{ p: 1, fontWeight: "bold" }}
+          onClick={() => navigate(URL.ADD_TRAIN)}
+        >
+          훈련하기
+        </Button>
+      </Box>
+    </Box>
+  );
+};

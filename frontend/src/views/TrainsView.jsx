@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Box, Button, Dialog, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-import SheetCreate from "components/sheet/SheetCreate";
-import SheetView from "./SheetView";
 import { requestGet } from "utils/fetch";
 import { URL } from "constants/url";
 import dayjs from "dayjs";
@@ -12,9 +10,7 @@ import { useNavigate } from "react-router-dom";
 const TrainsView = () => {
   const navigate = useNavigate();
   const [trains, setTrains] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [sheet, setSheet] = useState();
-  
+
   const getTrains = async () => {
     const response = await requestGet(URL.GET_TRAINS);
     console.log("response: ", response);
@@ -47,7 +43,7 @@ const TrainsView = () => {
         <Button
           variant="contained"
           sx={{ width: 40, height: 40 }}
-          onClick={() => setOpen(true)}
+          onClick={() => navigate(URL.ADD_TRAIN)}
         >
           <AddIcon />
         </Button>
@@ -84,28 +80,13 @@ const TrainsView = () => {
           <Button
             variant="contained"
             sx={{ mr: 0.5 }}
-            onClick={() => setOpen(true)}
+            onClick={() => navigate(URL.ADD_TRAIN)}
           >
             <AddIcon />
           </Button>
           버튼을 눌러 시트를 추가해보세요!
         </Box>
       )}
-      {open && <SheetCreate close={() => setOpen(false)} setSheet={setSheet} />}
-      <Dialog
-        open={!!sheet}
-        sx={{
-          "& .MuiDialog-paper": {
-            width: "100%",
-            height: "100%",
-            margin: 0,
-            maxHeight: "100%",
-          },
-        }}
-        onClose={() => setSheet(null)}
-      >
-        {sheet && <SheetView sheet={sheet} setSheet={setSheet} />}
-      </Dialog>
     </Box>
   );
 };

@@ -27,6 +27,7 @@ const QUERY = {
   UPDATE_TRAIN:
     "update trains set distance=?, arrow_count=?, end_count=? where id=? and user_id=?",
   UPDATE_END: "update ends set scores=? where id=? and user_id=?",
+  UPDATE_TRAIN_STATS: "update trains set total_score=?, total_shot=? where id=? and user_id=?",
   GET_TEAM: "select * from users where team_id=?",
 };
 
