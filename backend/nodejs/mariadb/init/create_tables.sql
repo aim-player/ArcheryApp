@@ -43,7 +43,7 @@ create table if not exists places (
 create table if not exists player_profile (
   user_id char(36) primary key not null,
   birth varchar(20),
-  gender int,
+  gender tinyint(1),
   country varchar(50),
   visible tinyint(1) default 1,
   constraint fk_users_player_profile foreign key (user_id) references users(id) on delete cascade

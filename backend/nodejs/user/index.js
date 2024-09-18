@@ -405,7 +405,7 @@ const updatePlayerProfile = async (req, res) => {
       // Update Profile
       let queryString = [];
       for (let key in data) {
-        if (data[key] !== "") {
+        if (!!data[key]) {
           queryString.push(`${key}='${data[key]}'`);
         }
       }
