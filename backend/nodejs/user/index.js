@@ -147,10 +147,11 @@ const addProfile = async (req, res) => {
   let conn;
   try {
     const { role, name } = req.body;
-    const { email } = req.userInfo;
+    const { id, email } = req.userInfo;
 
     conn = await pool.getConnection();
     await conn.query(QUERY.ADD_PROFILE, [role, name, email]);
+    if (role === 1) await conn.query(QUERY.ADD_PLAYER_PROFILE, [id]);
     res.json(req.body);
   } catch (err) {
     console.error("Add Profile Error: ", err);
@@ -440,14 +441,34 @@ const updatePlayerProfile = async (req, res) => {
   }
 };
 
+const findPlayers = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { name } = req.query;
+    const rows = await conn.query(QUERY.FIND_PLAYER, [name]);
+
+    return res.json({ players: rows });
+  } catch (err) {
+    console.error("Find Players Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
 const getTeam = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
     const { team_id } = req.userInfo;
-
     const rows = await conn.query(QUERY.GET_TEAM, [team_id]);
-    return res.json({ players: rows });
+
+    const members = await conn.query(QUERY.GET_TEAM_PLAYERS, [team_id]);
+
+    return rows.length > 0
+      ? res.json({ team: rows[0], members })
+      : res.send(null);
   } catch (err) {
     console.error("Get Team Error: ", err);
     res.sendStatus(500);
@@ -455,7 +476,76 @@ const getTeam = async (req, res) => {
     if (conn) conn.release();
   }
 };
+const createTeam = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const { name, description } = req.body;
+    const newTeamId = v4();
+    await conn.query(QUERY.CREATE_TEAM, [newTeamId, id, name, description]);
+    await conn.query(QUERY.REGISTER_PLAYER, [newTeamId, id]);
 
+    req.userInfo.team_id = newTeamId;
+    res
+      .cookie(
+        "session",
+        JSON.stringify({ ...req.session, userInfo: req.userInfo }),
+        { httpOnly: true, sameSite: "None", secure: true }
+      )
+      .sendStatus(200);
+  } catch (err) {
+    console.error("Create Team Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const inviteTeam = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { team_id, user_id, team_name } = req.body;
+    const content = {
+      team_name: team_name,
+    };
+
+    await conn.query(QUERY.INVITE_TEAM, [
+      team_id,
+      user_id,
+      JSON.stringify(content),
+    ]);
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Invite Team Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const getTeamInvitations = async (req, res) => {
+  let conn, rows;
+  try {
+    conn = await pool.getConnection();
+    const { id, role } = req.userInfo;
+    const { team_id } = req.query;
+    if (role === 1) {
+      rows = await conn.query(QUERY.GET_TEAM_INVITATIONS, [id, id]);
+    } else if (role === 2) {
+      rows = await conn.query(QUERY.GET_TEAM_INVITATIONS, [team_id, team_id]);
+    }
+
+    return res.json({ invitations: rows });
+  } catch (err) {
+    console.error("Get Invitations Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 module.exports = {
   getUserProfile,
   upateUserName,
@@ -478,5 +568,9 @@ module.exports = {
   updateEnds,
   getPlayerProfile,
   updatePlayerProfile,
+  findPlayers,
   getTeam,
+  createTeam,
+  inviteTeam,
+  getTeamInvitations,
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Dialog, MenuItem, Typography } from "@mui/material";
+import { Box, Button, MenuItem, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 import { requestGet } from "utils/fetch";

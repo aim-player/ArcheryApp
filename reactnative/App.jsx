@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {SafeAreaView, StyleSheet, Platform} from 'react-native';
+import {SafeAreaView, StyleSheet, Platform, Share} from 'react-native';
 import WebView from 'react-native-webview';
 import RNFS from 'react-native-fs';
 import {createSheet, deleteSheets, updateSheet} from '@/src/sheetManager';
@@ -130,6 +130,15 @@ const App = () => {
       setOpenLogin(true);
     } else if (message.type === 'signout') {
       signOutGoogle();
+    }
+    switch (message.type) {
+      case 'invite':
+        Share.share({
+          title: `${message.payload.name} 팀에 초대합니다`,
+          url: URL + `/?team_id=${message.payload.team_id}`,
+        });
+        break;
+      default:
     }
   };
 

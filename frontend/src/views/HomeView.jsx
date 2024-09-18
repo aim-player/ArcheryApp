@@ -148,7 +148,9 @@ const TrainLogs = () => {
           >
             <Typography sx={{ fontWeight: "bold" }}>평균 점수</Typography>
             <Typography sx={{ fontSize: 20, fontWeight: "bold" }}>
-              {(stats.totalScore / stats.totalShot).toFixed(2)}
+              {stats.totalShot > 0
+                ? (stats.totalScore / stats.totalShot).toFixed(2)
+                : 0}
             </Typography>
           </Box>
         </Box>

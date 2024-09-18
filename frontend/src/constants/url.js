@@ -1,6 +1,6 @@
 export const URL = {
   HOME: "/",
-  GROUP: "/group",
+  TEAM: "/team",
   SETTING: "/setting",
   LOGIN_OAUTH: "/login/oauth",
   LOGOUT: "/logout",
@@ -18,6 +18,7 @@ export const URL = {
 
   GET_PLAYER_PROFILE: "/player/profile/get",
   UPDATE_PLAYER_PROFILE: "/player/profile/update",
+  FIND_PLAYER: "/player/find",
 
   // Sheet
   ADD_SHEET: "/sheet/add",
@@ -46,4 +47,7 @@ export const URL = {
 
   // Team
   GET_TEAM: "/team",
+  CREATE_TEAM: "/team/create",
+  INVITE_TEAM: "/team/invite",
+  GET_TEAM_INVITATIONS: "/team/invite",
 };

@@ -26,7 +26,7 @@ const CustomBottomNavigation = () => {
       />
       {user && user.role === 2 && (
         <BottomNavigationAction
-          value={URL.GROUP}
+          value={URL.TEAM}
           label="팀 관리"
           icon={<GroupsIcon />}
         />

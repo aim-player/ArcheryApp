@@ -17,6 +17,7 @@ import TrainView from "views/TrainView";
 import TrainsView from "views/TrainsView";
 import SettingView from "views/SettingView";
 import CustomBottomNavigation from "components/CustomBottomNavigation";
+import TeamView from "views/TeamView";
 
 dayjs.locale("ko");
 
@@ -125,6 +126,7 @@ function App() {
           <Route path={URL.TRAINS} element={<TrainsView />} />
           <Route path={URL.TRAIN} element={<TrainView />} />
           <Route path={URL.SETTING} element={<SettingView />} />
+          <Route path={URL.TEAM} element={<TeamView />} />
         </Routes>
         <CustomBottomNavigation />
       </Container>

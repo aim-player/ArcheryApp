@@ -28,7 +28,11 @@ const {
   deletePlace,
   getPlayerProfile,
   updatePlayerProfile,
+  findPlayers,
   getTeam,
+  createTeam,
+  inviteTeam,
+  getTeamInvitations,
 } = require("./user");
 
 const app = express();
@@ -63,6 +67,7 @@ app.get("/user/places", validateSession, getPlaces);
 // Player
 app.get("/player/profile/get", validateSession, getPlayerProfile);
 app.post("/player/profile/update", validateSession, updatePlayerProfile);
+app.post("/player/find", validateSession, findPlayers);
 
 // Sheet
 app.post("/sheet/add", validateSession, addSheet);
@@ -88,6 +93,9 @@ app.post("/place/delete", validateSession, deletePlace);
 
 // Team
 app.get("/team", validateSession, getTeam);
+app.post("/team/create", validateSession, createTeam);
+app.post("/team/invite", validateSession, inviteTeam);
+app.get("/team/invite", validateSession, getTeamInvitations);
 
 app.listen(8080, () => {
   console.log("======== Nodejs Server Started");
