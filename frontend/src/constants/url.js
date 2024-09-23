@@ -8,6 +8,10 @@ export const URL = {
 
   PROFILE_INIT: "/profile/init",
 
+  // Player
+  PLAYER_EQUIPMENT: "/player/equipment",
+  PLAYER_STATS: "/player/stats",
+
   // API
   // User
   UPDATE_USER_NAME: "/user/name",

@@ -17,8 +17,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import TimelineIcon from "@mui/icons-material/Timeline";
+import { useNavigate } from "react-router-dom";
 
 const TeamView = () => {
+  const navigate = useNavigate();
   const [, setConfirm] = useConfirm();
   const [user, setUser] = useUser();
   const [team, setTeam] = useState();
@@ -198,7 +200,15 @@ const TeamView = () => {
                   >
                     <Box sx={{ fontSize: 18 }}>{p.name}</Box>
                     <Box sx={{ display: "flex", gap: 1 }}>
-                      <Button variant="contained" sx={{ p: 1 }}>
+                      <Button
+                        variant="contained"
+                        sx={{ p: 1 }}
+                        onClick={() =>
+                          navigate(URL.PLAYER_EQUIPMENT, {
+                            state: { player_id: p.id },
+                          })
+                        }
+                      >
                         <ConstructionIcon />
                       </Button>
                       <Button variant="contained" sx={{ p: 1 }}>

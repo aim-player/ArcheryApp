@@ -9,14 +9,17 @@ import MainView from "./views/MainView";
 import theme from "./utils/theme";
 import "./App.css";
 import { refreshSession, requestLogin } from "utils/fetch";
-import ProfileInitializer from "components/login/ProfileInitializer";
 import { URL } from "constants/url";
+
+import ProfileInitializer from "components/login/ProfileInitializer";
 import { CustomAlert, CustomConfirm } from "components/Components";
 import TrainCreate from "components/train/TrainCreate";
+import CustomBottomNavigation from "components/CustomBottomNavigation";
+import PlayerEquipment from "components/master/PlayerEquipment";
+
 import TrainView from "views/TrainView";
 import TrainsView from "views/TrainsView";
 import SettingView from "views/SettingView";
-import CustomBottomNavigation from "components/CustomBottomNavigation";
 import TeamView from "views/TeamView";
 
 dayjs.locale("ko");
@@ -127,6 +130,7 @@ function App() {
           <Route path={URL.TRAIN} element={<TrainView />} />
           <Route path={URL.SETTING} element={<SettingView />} />
           <Route path={URL.TEAM} element={<TeamView />} />
+          <Route path={URL.PLAYER_EQUIPMENT} element={<PlayerEquipment />} />
         </Routes>
         <CustomBottomNavigation />
       </Container>
