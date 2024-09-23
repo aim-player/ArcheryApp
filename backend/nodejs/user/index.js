@@ -546,6 +546,60 @@ const getTeamInvitations = async (req, res) => {
     if (conn) conn.release();
   }
 };
+
+const acceptTeamInvitation = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const { team_id } = req.body;
+
+    await conn.query(QUERY.ACCEPT_TEAM_INVITATION, [team_id, id]);
+    await conn.query(QUERY.DELETE_TEAM_INVITATION, [id, team_id]);
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Accept Invitation Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const deleteTeamInvitation = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const { team_id } = req.body;
+
+    await conn.query(QUERY.DELETE_TEAM_INVITATION, [id, team_id]);
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Delete Invitation Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const getNotifications = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { id } = req.userInfo;
+    const payload = {};
+    payload.invitations = await conn.query(QUERY.GET_PLAYER_INVITATIONS, [id]);
+
+    return res.json(payload);
+  } catch (err) {
+    console.error("Get Notifications Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 module.exports = {
   getUserProfile,
   upateUserName,
@@ -573,4 +627,7 @@ module.exports = {
   createTeam,
   inviteTeam,
   getTeamInvitations,
+  acceptTeamInvitation,
+  deleteTeamInvitation,
+  getNotifications,
 };

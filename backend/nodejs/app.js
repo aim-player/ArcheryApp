@@ -33,6 +33,9 @@ const {
   createTeam,
   inviteTeam,
   getTeamInvitations,
+  acceptTeamInvitation,
+  deleteTeamInvitation,
+  getNotifications,
 } = require("./user");
 
 const app = express();
@@ -96,6 +99,11 @@ app.get("/team", validateSession, getTeam);
 app.post("/team/create", validateSession, createTeam);
 app.post("/team/invite", validateSession, inviteTeam);
 app.get("/team/invite", validateSession, getTeamInvitations);
+app.post("/team/invite/accept", validateSession, acceptTeamInvitation);
+app.post("/team/invite/reject", validateSession, deleteTeamInvitation);
+
+// Notification
+app.get("/notifications", validateSession, getNotifications);
 
 app.listen(8080, () => {
   console.log("======== Nodejs Server Started");

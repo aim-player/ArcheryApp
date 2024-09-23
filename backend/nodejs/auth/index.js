@@ -73,7 +73,7 @@ const validateSession = (req, res, next) => {
 
 const refreshSession = async (req, res) => {
   const { session } = req.cookies;
-  if (!session) return res.status(401).send("No Session");
+  if (!session) return res.send(null);
 
   req.session = JSON.parse(session);
   req.userInfo = JSON.parse(session).userInfo;

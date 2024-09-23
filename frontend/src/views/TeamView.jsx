@@ -15,6 +15,8 @@ import { URL } from "constants/url";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import DraftsIcon from "@mui/icons-material/Drafts";
+import ConstructionIcon from "@mui/icons-material/Construction";
+import TimelineIcon from "@mui/icons-material/Timeline";
 
 const TeamView = () => {
   const [, setConfirm] = useConfirm();
@@ -183,7 +185,28 @@ const TeamView = () => {
             </Box>
             <Box>
               {members.players.length > 0 ? (
-                members.players.map((p, i) => <Box></Box>)
+                members.players.map((p, i) => (
+                  <Box
+                    key={`player_${i}`}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      p: 2,
+                      border: "1px solid #eee",
+                    }}
+                  >
+                    <Box sx={{ fontSize: 18 }}>{p.name}</Box>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button variant="contained" sx={{ p: 1 }}>
+                        <ConstructionIcon />
+                      </Button>
+                      <Button variant="contained" sx={{ p: 1 }}>
+                        <TimelineIcon />
+                      </Button>
+                    </Box>
+                  </Box>
+                ))
               ) : (
                 <Box sx={{ p: 1 }}>
                   <Box></Box>

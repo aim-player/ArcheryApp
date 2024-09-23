@@ -50,4 +50,9 @@ export const URL = {
   CREATE_TEAM: "/team/create",
   INVITE_TEAM: "/team/invite",
   GET_TEAM_INVITATIONS: "/team/invite",
+  ACCEPT_INVITE: "/team/invite/accept",
+  REJECT_INVITE: "/team/invite/reject",
+
+  // Notification
+  GET_NOTIFICATIONS: "/notifications",
 };

@@ -38,12 +38,17 @@ const QUERY = {
     "insert into team_invitations (team_id, player_id, content) values (?,?,?)",
   GET_TEAM_INVITATIONS:
     "select * from team_invitations where team_id=? or player_id=?",
+  ACCEPT_TEAM_INVITATION: "update users set team_id=? where id=?",
+  DELETE_TEAM_INVITATION:
+    "delete from team_invitations where player_id=? and team_id=?",
   REGISTER_PLAYER: "update users set team_id=? where id=?",
   FIND_PLAYER: `select u.id, u.name, u.image_url, t.name as team_name 
   from users u 
   join player_profile p on u.id = p.user_id 
   left join teams t on u.team_id = t.team_id 
   where u.role=1 and p.visible=1 and u.name=?`,
+
+  GET_PLAYER_INVITATIONS: "select * from team_invitations where player_id=?",
 };
 
 module.exports = {

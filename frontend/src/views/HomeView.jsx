@@ -18,12 +18,14 @@ import PlayerProfileView from "./PlayerProfileView";
 import { useNavigate } from "react-router-dom";
 import { URL } from "constants/url";
 import { requestGet } from "utils/fetch";
+import NotificationView from "./NotificationView";
 
 const HomeView = () => {
   const navigate = useNavigate();
   const [user] = useUser();
   // const loadData = useDataLoader();
   const [openPlayerProfile, setOpenPlayerProfile] = useState(false);
+  const [openNotifications, setOpenNotifications] = useState(false);
 
   useEffect(() => {
     // if (user) loadData();
@@ -43,16 +45,25 @@ const HomeView = () => {
         >
           <Typography sx={{ fontWeight: "bold" }}>{user.name}</Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
+            {user.role === 1 && (
+              <Button
+                variant="contained"
+                sx={{ p: 1 }}
+                onClick={() => setOpenPlayerProfile(true)}
+              >
+                <PersonIcon />
+              </Button>
+            )}
             <Button
               variant="contained"
               sx={{ p: 1 }}
-              onClick={() => setOpenPlayerProfile(true)}
+              onClick={() => setOpenNotifications(true)}
             >
-              <PersonIcon />
-            </Button>
-            <Button variant="contained" sx={{ p: 1 }}>
               <NotificationsIcon />
             </Button>
+            {openNotifications && (
+              <NotificationView close={() => setOpenNotifications(false)} />
+            )}
           </Box>
         </Box>
       ) : (
