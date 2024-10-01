@@ -11,6 +11,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
 } from '@react-native-google-signin/google-signin';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import {useEffect} from 'react';
 import {GOOGLE_CLIENT_ID} from '@env';
@@ -55,7 +56,9 @@ const LoginView = ({open, close, sendMessage}) => {
           <View style={styles.modal_header}>
             <Text style={[styles.text, styles.title]}>로그인</Text>
             <TouchableOpacity onPress={close} style={styles.btn_close}>
-              <Text style={styles.text}>닫기</Text>
+              <Text style={styles.text}>
+                <Icon name="close" size={24} color="#000" />
+              </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.login_methods}>
@@ -93,7 +96,6 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
   },
   login_methods: {
     flex: 1,
