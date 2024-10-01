@@ -1,25 +1,15 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  List,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
+import { Box, Button, List, MenuItem, Select, Typography } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
 import { requestPost } from "utils/fetch";
 import { URL } from "constants/url";
-import { useEnds } from "utils/context";
 import { useNavigate } from "react-router-dom";
 import PlaceSelector from "./PlaceSelector";
 
 const TrainCreate = () => {
   const navigate = useNavigate();
-  const [ends] = useEnds();
   const [openPlaceDialog, setOpenPlaceDialog] = useState(false);
   const [inputs, setInputs] = useState({
     distance: DISTANCE[3],
@@ -29,25 +19,6 @@ const TrainCreate = () => {
   });
 
   const addTrain = async () => {
-    // const payload = {
-    //   sheet_id: sheet.id,
-    //   ...inputs,
-    // };
-    // const requestOptions = {
-    //   data: payload,
-    // };
-    // const response = await requestPost(URL.ADD_ROUND, requestOptions);
-    // if (response.status === 200) {
-    //   // loadData();
-    //   close();
-    // }
-    // const newRound = {
-    //   id: generateRoundId(),
-    //   ...inputs,
-    // };
-    // const rounds = sheet.rounds ? [...sheet.rounds, newRound] : [newRound];
-    // requestFetch("update_sheet", { ...sheet, rounds });
-    // close();
     const requestOptions = {
       data: inputs,
     };
@@ -57,69 +28,7 @@ const TrainCreate = () => {
       navigate(URL.TRAIN, { state: { id } });
     }
   };
-  const updateEnds = async () => {
-    // const targetEnds = [...ends.filter((e) => e.round_id === editTarget.id)];
-    // if (targetEnds.length === 0) return;
-    // const updatedEnds =
-    //   editTarget.arrow_count > inputs.arrowCount
-    //     ? targetEnds.map((end) => {
-    //         end.scores = JSON.stringify(
-    //           JSON.parse(end.scores).splice(0, inputs.arrowCount)
-    //         );
-    //         return end;
-    //       })
-    //     : targetEnds.map((end) => {
-    //         end.scores = JSON.stringify([
-    //           ...JSON.parse(end.scores),
-    //           ...Array(inputs.arrowCount - editTarget.arrow_count).fill(null),
-    //         ]);
-    //         return end;
-    //       });
-    // const requestOptions = {
-    //   data: {
-    //     endCount: inputs.endCount,
-    //     ends: updatedEnds,
-    //   },
-    // };
-    // const response = await requestPost(URL.UPDATE_END_ALL, requestOptions);
-    // if (response.status === 200) {
-    //   // loadData();
-    // }
-  };
-  const updateRound = async () => {
-    // const payload = {
-    //   round_id: editTarget.id,
-    //   ...inputs,
-    // };
-    // const requestOptions = {
-    //   data: payload,
-    // };
-    // const response = await requestPost(URL.UPDATE_ROUND, requestOptions);
-    // await updateEnds();
-    // if (response.status === 200) {
-    //   // loadData();
-    //   close();
-    // }
-    // const rounds = appData.rounds ? appData.rounds: {};
-    // const sheetRounds = rounds[sheet.created_at];
-    // if (sheetRounds)
-    //   rounds[sheet.created_at] = rounds[sheet.created_at].map((s) => {
-    //     if (s.id === editTarget.id) return { id: s.id, ...inputs };
-    //     else return s;
-    //   });
-    // else rounds[sheet.created_at] = [];
-    // setAppData((state) => ({ ...state, rounds }));
-    // close();
-  };
-  // const applyEditTarget = () =>
-  //   setInputs({
-  //     ...editTarget,
-  //     arrowCount: editTarget.arrow_count,
-  //     endCount: editTarget.end_count,
-  //   });
-  useEffect(() => {
-    // if (editTarget) applyEditTarget();
-  }, []);
+
   return (
     <Box
       sx={{
@@ -143,13 +52,14 @@ const TrainCreate = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Button variant="contained" sx={{ p: 1 }} onClick={() => navigate(URL.TRAINS)}>
+        <Button
+          variant="contained"
+          sx={{ p: 1 }}
+          onClick={() => navigate(URL.TRAINS)}
+        >
           <ArrowBackIcon />
         </Button>
-        <Typography variant="h5">
-          훈련 추가
-          {/* 라운드 {editTarget ? "수정" : "추가"} */}
-        </Typography>
+        <Typography variant="h5">훈련 추가</Typography>
       </Box>
       <Box
         sx={{
@@ -232,29 +142,9 @@ const TrainCreate = () => {
               onClose={() => setOpenPlaceDialog(false)}
               onSelect={(place) => setInputs((state) => ({ ...state, place }))}
             />
-            {/* <Select
-              sx={{ flex: 1, p: 1 }}
-              value={inputs.endCount}
-              onChange={(e) =>
-                setInputs((state) => ({ ...state, endCount: e.target.value }))
-              }
-            >
-              {END_COUNT.map((d) => (
-                <MenuItem value={d} key={`end_count_${d}`}>
-                  {d}엔드
-                </MenuItem>
-              ))}
-            </Select> */}
           </List>
         </Box>
-        <Button
-          fullWidth
-          variant="contained"
-          sx={{ p: 1 }}
-          // onClick={editTarget ? updateRound : addTrain}
-          onClick={addTrain}
-        >
-          {/* {editTarget ? "수정하기" : "시작하기"} */}
+        <Button fullWidth variant="contained" sx={{ p: 1 }} onClick={addTrain}>
           시작하기
         </Button>
       </Box>

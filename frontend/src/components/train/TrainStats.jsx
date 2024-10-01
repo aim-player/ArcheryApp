@@ -8,8 +8,11 @@ import {
 import { LineChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { requestGet } from "utils/fetch";
+import { URL } from "constants/url";
 
-const TrainStats = ({ close, train }) => {
+const TrainStats = ({ close, train, player }) => {
+  const [ends, setEnds] = useState([]);
   const [endScores, setEndScores] = useState([]);
   const convertChartData = () => {
     const convertScore = (score) => {
@@ -18,9 +21,10 @@ const TrainStats = ({ close, train }) => {
       return score;
     };
 
-    const data = train.ends.map((end) => {
+    const data = ends.map((end) => {
       let score = 0;
-      end.data.forEach((s) => {
+      const scores = JSON.parse(end.scores);
+      scores.forEach((s) => {
         if (s) score += convertScore(s);
       });
       end.score = score;
@@ -28,11 +32,25 @@ const TrainStats = ({ close, train }) => {
     });
     setEndScores(data);
   };
-  useEffect(() => {
-    if (train.ends) {
-      convertChartData();
+  const getEnds = async () => {
+    const requestOptions = {
+      params: { train_id: train.id, player_id: player?.id },
+    };
+    const response = await requestGet(
+      player ? URL.GET_TEAM_ENDS : URL.GET_ENDS,
+      requestOptions
+    );
+    if (response.status === 200) {
+      const { ends } = response.data;
+      setEnds(ends);
     }
+  };
+  useEffect(() => {
+    getEnds();
   }, []);
+  useEffect(() => {
+    if (ends.length > 0) convertChartData();
+  }, [ends]);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <DialogTitle

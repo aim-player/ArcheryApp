@@ -77,7 +77,6 @@ const NotificationView = ({ close }) => {
             <Box>
               {notifications.invitations.map((invitation, index) => {
                 const content = JSON.parse(invitation.content);
-                console.log("invitation: ", invitation);
                 return (
                   <Box
                     key={`invitation_${index}`}

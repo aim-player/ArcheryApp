@@ -1,53 +1,146 @@
-import { useEffect, useState } from "react";
 import {
   Box,
-  DialogTitle,
   Button,
-  ButtonGroup,
-  Menu,
-  MenuItem,
   Dialog,
   Grid,
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  Divider,
+  Menu,
+  MenuItem,
+  Typography,
 } from "@mui/material";
-
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import AddIcon from "@mui/icons-material/Add";
-import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
-import BackspaceIcon from "@mui/icons-material/Backspace";
-
-import TrainCreate from "components/train/TrainCreate";
-import { SCORE_COLOR } from "constants/rule";
-import TrainStats from "components/train/TrainStats";
+import { URL } from "constants/url";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAlert } from "utils/context";
 import { requestGet, requestPost } from "utils/fetch";
-import { URL } from "constants/url";
-import { useLocation, useNavigate } from "react-router-dom";
-
-const ButtonPad = [
-  ["X", 10, "M", "ERASE"],
-  [9, 8, 7, "SAVE"],
-  [6, 5, 4],
-  [3, 2, 1],
-];
-
-const TrainView = () => {
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import AddIcon from "@mui/icons-material/Add";
+import { ScoreEditor } from "./TrainView";
+const TeamTrainView = () => {
+  const [, setAlert] = useAlert();
   const location = useLocation();
   const navigate = useNavigate();
-  const [, setAlert] = useAlert();
-  const [train, setTrain] = useState({});
+
+  const [train, setTrain] = useState();
+  const [team, setTeam] = useState();
+  const [players, setPlayers] = useState([]);
+  const [player, setPlayer] = useState();
+  const getTeamTrain = async () => {
+    if (!location?.state?.train)
+      return setAlert({
+        active: true,
+        message: "잘못된 접근입니다.",
+        callbackFn: () => navigate("/"),
+      });
+    const requestOptions = {
+      params: {
+        team_id: location.state.team_id,
+        create_time: location.state.train.create_time,
+      },
+    };
+    const response = await requestGet(URL.GET_TEAM_TRAIN, requestOptions);
+    if (response.status === 200) {
+      const { players } = response.data;
+      setPlayers(
+        players.map((player) => ({
+          train_id: player.train_id,
+          name: player.name,
+          user_id: player.user_id,
+        }))
+      );
+    }
+    setTrain(location.state.train);
+  };
+  const getTeam = async () => {
+    const response = await requestGet(URL.GET_TEAM, {
+      params: { team_id: location.state.team_id },
+    });
+    if (response.status === 200) {
+      const { team } = response.data;
+      setTeam(team);
+    }
+  };
+  useEffect(() => {
+    getTeamTrain();
+    getTeam();
+  }, []);
+
+  useEffect(() => {
+    if (!team || players.length === 0) return;
+    setPlayer(players[0]);
+  }, [players, team]);
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        overflowY: "auto",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          p: 1,
+          gap: 1,
+          borderBottom: "2px solid #000",
+        }}
+      >
+        <Button
+          variant="contained"
+          sx={{ p: 1 }}
+          onClick={() => navigate(URL.TEAM_TRAINS)}
+        >
+          <ArrowBackIcon />
+        </Button>
+        <Typography variant="h5">팀 훈련</Typography>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          overflowX: "auto",
+          gap: 1,
+          borderBottom: "2px solid #000",
+        }}
+      >
+        {players.map((p, i) => (
+          <Box
+            onClick={() => setPlayer(p)}
+            sx={{
+              p: 1,
+              bgcolor:
+                player && player.user_id === p.user_id ? "#eee" : "transparent",
+            }}
+            key={`player_${i}`}
+          >
+            {p.name}
+          </Box>
+        ))}
+      </Box>
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        {player ? (
+          <TeamTrainEnds
+            train={train}
+            train_id={player.train_id}
+            user_id={player.user_id}
+            player={player}
+          />
+        ) : (
+          <Box>데이터 로딩중...</Box>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+export default TeamTrainView;
+
+const TeamTrainEnds = ({ train, train_id, player }) => {
   const [trainEnds, setTrainEnds] = useState([]);
   const [anchorEl, setAnchorEl] = useState();
-  const [editTarget, setEditTarget] = useState();
   const [currentEnd, setCurrentEnd] = useState();
-
+  const [editTarget, setEditTarget] = useState();
   const [openEditor, setOpenEditor] = useState(false);
   const [openStats, setOpenStats] = useState(false);
 
@@ -55,24 +148,14 @@ const TrainView = () => {
     setEditTarget(train);
     setAnchorEl(null);
   };
-  const deleteRound = async () => {
-    if (!window.confirm("이 훈련일지을 삭제할까요?")) return;
-    const requestOptions = {
-      data: { train_id: train.id },
-    };
-    const response = await requestPost(URL.DELETE_TRAIN, requestOptions);
-    if (response.status === 200) {
-      navigate(URL.TRAINS);
-    }
-  };
   const addEnd = async (scores) => {
     if (!currentEnd && trainEnds.length >= train.end_count) return;
 
     const requestOptions = {
-      data: { train_id: train.id, scores },
+      data: { train_id, player_id: player.user_id, scores },
     };
 
-    const response = await requestPost(URL.ADD_END, requestOptions);
+    const response = await requestPost(URL.ADD_TEAM_END, requestOptions);
     if (response.status === 200) {
       setCurrentEnd(null);
       setOpenEditor(false);
@@ -82,97 +165,53 @@ const TrainView = () => {
   const editEnd = async (scores) => {
     const requestOptions = {
       data: {
-        train_id: train.id,
+        train_id,
+        player_id: player.user_id,
         end_id: currentEnd.id,
         scores,
       },
     };
-    const response = await requestPost(URL.UPDATE_END, requestOptions);
+    const response = await requestPost(URL.UPDATE_TEAM_END, requestOptions);
     if (response.status === 200) {
-      getEnds();
       setCurrentEnd(null);
       setOpenEditor(false);
-    }
-  };
-
-  const getTrain = async () => {
-    if (!location.state || !location.state.id) {
-      setAlert({
-        active: true,
-        message: "훈련을 선택해주세요",
-        callbackFn: () => navigate(URL.TRAINS),
-      });
-      return;
-    }
-    const requestOptions = {
-      params: { train_id: location.state.id },
-    };
-    const response = await requestGet(URL.GET_TRAIN, requestOptions);
-    if (response.status === 200) {
-      const { train } = response.data;
-      setTrain(train);
+      getEnds();
     }
   };
 
   const getEnds = async () => {
-    if (!train || !train.id) return;
     const requestOptions = {
-      params: { train_id: train.id },
+      params: { train_id, player_id: player.user_id },
     };
-    const response = await requestGet(URL.GET_ENDS, requestOptions);
+    const response = await requestGet(URL.GET_TEAM_ENDS, requestOptions);
     if (response.status === 200) {
       const { ends } = response.data;
       if (ends) setTrainEnds(ends);
     }
   };
-
   useEffect(() => {
-    getTrain();
-  }, []);
+    if (!train || !player) return;
+    getEnds();
+  }, [train, player]);
 
-  useEffect(() => {
-    if (train) getEnds();
-  }, [train]);
   return (
     <Box
       sx={{
-        position: "absolute",
-        top: 0,
-        left: 0,
         display: "flex",
         flexDirection: "column",
-        width: "100%",
         height: "100%",
-        bgcolor: "#fff",
-        zIndex: 2,
       }}
     >
-      <DialogTitle
-        sx={{ display: "flex", justifyContent: "space-between", p: 1 }}
-      >
-        <Button
-          variant="contained"
-          sx={{ p: 1 }}
-          onClick={() => navigate(URL.TRAINS)}
+      <Box sx={{ height: "100%", overflowY: "auto" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            p: 1,
+            overflowY: "auto",
+          }}
         >
-          <ArrowBackIcon />
-        </Button>
-        <ButtonGroup
-          sx={{ gap: 1, "& .MuiButton-root": { p: 1, borderRadius: 1 } }}
-        >
-          <Button variant="contained" onClick={() => setOpenStats(true)}>
-            <TimelineIcon />
-          </Button>
-          <Button
-            variant="contained"
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-          >
-            <MoreVertIcon />
-          </Button>
-        </ButtonGroup>
-      </DialogTitle>
-      <Box sx={{ border: "1px solid #ccc", height: "100%" }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, p: 1 }}>
           {trainEnds &&
             trainEnds.map((end, endIndex) => (
               <MenuItem
@@ -409,16 +448,16 @@ const TrainView = () => {
         onClose={() => setAnchorEl(null)}
       >
         <MenuItem onClick={editRound}>라운드 수정</MenuItem>
-        <MenuItem onClick={deleteRound}>라운드 삭제</MenuItem>
+        {/* <MenuItem onClick={deleteRound}>라운드 삭제</MenuItem> */}
       </Menu>
-      {editTarget && (
+      {/* {editTarget && (
         <TrainCreate
           // sheet={sheet}
           close={() => setEditTarget(null)}
           // setRound={setRound}
           editTarget={editTarget}
         />
-      )}
+      )} */}
       <Dialog
         open={openEditor}
         onClose={() => {
@@ -438,161 +477,8 @@ const TrainView = () => {
         />
       </Dialog>
       <Dialog open={openStats} onClose={() => setOpenStats(false)} fullScreen>
-        <TrainStats train={train} close={() => setOpenStats(false)} />
+        {/* <TrainStats train={train} close={() => setOpenStats(false)} /> */}
       </Dialog>
-    </Box>
-  );
-};
-
-export default TrainView;
-
-export const ScoreEditor = ({ train, end, addEnd, editEnd }) => {
-  const [scores, setScores] = useState(Array(train.arrow_count).fill(null));
-
-  const applyEnd = () => {
-    setScores(JSON.parse(end.scores));
-  };
-  const writeScore = (button) => {
-    const convertScore = (score) => {
-      if (score === "X") return 11;
-      if (score === "M") return 0;
-      return score;
-    };
-    let hasEmpty;
-    switch (button) {
-      case "X":
-        hasEmpty = scores.some((score) => score === null);
-        if (hasEmpty) {
-          const lastScoreIndex = scores.indexOf(null);
-          if (lastScoreIndex !== -1) {
-            setScores((state) => {
-              const temp = [...state];
-              temp[lastScoreIndex] = "X";
-              temp.sort((a, b) => convertScore(b) - convertScore(a));
-              return temp;
-            });
-          }
-        }
-        break;
-      case "M":
-        hasEmpty = scores.some((score) => score === null);
-        if (hasEmpty) {
-          const lastScoreIndex = scores.indexOf(null);
-          if (lastScoreIndex !== -1) {
-            setScores((state) => {
-              const temp = [...state];
-              temp[lastScoreIndex] = "M";
-              temp.sort((a, b) => convertScore(b) - convertScore(a));
-              return temp;
-            });
-          }
-        }
-        break;
-      case "ERASE":
-        const lastScoreIndex =
-          scores.indexOf(null) === -1 ? scores.length : scores.indexOf(null);
-        if (lastScoreIndex === 0 || lastScoreIndex === -1) return;
-        setScores((state) => {
-          const temp = [...state];
-          temp[lastScoreIndex - 1] = null;
-          return temp;
-        });
-        break;
-      case "SAVE":
-        if (end) editEnd(scores);
-        else addEnd(scores);
-        break;
-      default:
-        hasEmpty = scores.some((score) => score === null);
-        if (hasEmpty) {
-          const lastScoreIndex = scores.indexOf(null);
-          if (lastScoreIndex !== -1) {
-            setScores((state) => {
-              const temp = [...state];
-              temp[lastScoreIndex] = button;
-              temp.sort((a, b) => convertScore(b) - convertScore(a));
-              return temp;
-            });
-          }
-        }
-    }
-  };
-  useEffect(() => {
-    if (end) applyEnd();
-  }, []);
-  return (
-    <Box>
-      <Grid container gap={1} sx={{ padding: 1 }}>
-        {scores.map((score, index) => (
-          <Grid
-            item
-            key={`score_${index}`}
-            sx={{
-              width: "calc((100% - 16px) / 3)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 60,
-              fontSize: 24,
-              color: "#fff",
-              fontWeight: "bold",
-              bgcolor: SCORE_COLOR[score],
-              border: "2px solid #ccc",
-              borderRadius: 2,
-            }}
-          >
-            {score}
-          </Grid>
-        ))}
-      </Grid>
-      <Divider />
-      <TableContainer>
-        <Table sx={{ borderSpacing: 4, borderCollapse: "separate" }}>
-          <TableBody>
-            {ButtonPad.map((row, rowIndex) => (
-              <TableRow key={`row_${rowIndex}`}>
-                {row.map((cell, cellIndex) => (
-                  <TableCell
-                    sx={{
-                      position: "relative",
-                      width: "25%",
-                      textAlign: "center",
-                      p: 0,
-                      height: 60,
-                    }}
-                    key={`cell_${cellIndex}`}
-                    rowSpan={cell === "SAVE" ? 3 : 1}
-                  >
-                    <Button
-                      onClick={() => writeScore(cell)}
-                      fullWidth
-                      variant="contained"
-                      sx={{
-                        "&.MuiButton-root": {
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          p: 1,
-                          height: "100%",
-                          fontSize: 18,
-                        },
-                      }}
-                    >
-                      {cell === "SAVE" ? (
-                        <KeyboardReturnIcon />
-                      ) : cell === "ERASE" ? (
-                        <BackspaceIcon />
-                      ) : (
-                        cell
-                      )}
-                    </Button>
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
     </Box>
   );
 };

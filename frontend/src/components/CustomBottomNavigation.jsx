@@ -20,7 +20,7 @@ const CustomBottomNavigation = () => {
     >
       <BottomNavigationAction value={URL.HOME} label="홈" icon={<HomeIcon />} />
       <BottomNavigationAction
-        value={URL.TRAINS}
+        value={user?.role === 2 ? URL.TEAM_TRAINS : URL.TRAINS}
         label="기록"
         icon={<EditNoteIcon />}
       />

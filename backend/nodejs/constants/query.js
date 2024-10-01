@@ -15,7 +15,7 @@ const QUERY = {
     "insert into ends (user_id, train_id, scores) values (?, ?, ?) returning *",
   ADD_PLACE: "insert into places (user_id, name) values (?, ?) returning *",
   GET_SHEETS: "select * from sheets where user_id=?",
-  GET_TRAINS: "select * from trains where user_id=?",
+  GET_TRAINS: "select * from trains where user_id=? order by create_time desc",
   GET_TRAIN: "select * from trains where user_id=? and id=?",
   GET_ENDS: "select * from ends where user_id=? and train_id=?",
   GET_PLACES: "select  * from places where user_id=?",
@@ -49,6 +49,17 @@ const QUERY = {
   where u.role=1 and p.visible=1 and u.name=?`,
 
   GET_PLAYER_INVITATIONS: "select * from team_invitations where player_id=?",
+  GET_TEAM_TRAINS:
+    'select arrow_count, end_count, date_format(create_time, "%Y-%m-%d %H:%i:%s") as train_time, create_time from trains where team_id=? group by train_time order by train_time desc',
+  GET_TEAM_TRAIN:
+    "select u.name, t.user_id, t.id as train_id from trains t join users u on u.id=t.user_id where t.team_id=? and t.create_time=?",
+  ADD_TEAM_TRAIN:
+    "insert into trains (user_id, team_id, distance, arrow_count, end_count, place) values(?, ?, ?, ?, ?, ?) returning *",
+  GET_TEAM_PLAYER_TRAIN: "select * from ends where train_id=? and user_id=? ",
+
+  ADD_TEAM_END:
+    "insert into ends (user_id, train_id, scores) values (?, ?, ?) returning *",
+  UPDATE_TEAM_END: "update ends set scores=? where id=? and user_id=?",
 };
 
 module.exports = {

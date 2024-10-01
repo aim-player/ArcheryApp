@@ -6,20 +6,28 @@ import { requestGet } from "utils/fetch";
 import { URL } from "constants/url";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { useAlert, useUser } from "utils/context";
 
 const TrainsView = () => {
+  const [user] = useUser();
+  const [, setAlert] = useAlert();
   const navigate = useNavigate();
   const [trains, setTrains] = useState([]);
 
   const getTrains = async () => {
     const response = await requestGet(URL.GET_TRAINS);
-    console.log("response: ", response);
     if (response.status === 200) {
       const { trains } = response.data;
       setTrains(trains);
     }
   };
   useEffect(() => {
+    if (!user)
+      return setAlert({
+        active: true,
+        message: "로그인이 필요합니다.",
+        callbackFn: () => navigate("/"),
+      });
     getTrains();
   }, []);
   return (
@@ -28,6 +36,7 @@ const TrainsView = () => {
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        overflowY: "auto",
       }}
     >
       <Box
@@ -39,7 +48,7 @@ const TrainsView = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Typography variant="h5">훈련기록</Typography>
+        <Typography variant="h5">훈련일지</Typography>
         <Button
           variant="contained"
           sx={{ width: 40, height: 40 }}

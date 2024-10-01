@@ -33,6 +33,11 @@ export const URL = {
   TRAIN: "/train",
   TRAINS: "/trains",
 
+  // Team
+  TEAM_TRAIN: "/team/train",
+  TEAM_TRAINS: "/team/trains",
+  TEAM_PLAYER_TRAINS: "/team/player/trains",
+
   GET_TRAIN: "/train",
   GET_TRAINS: "/trains",
   ADD_TRAIN: "/train/add",
@@ -56,6 +61,12 @@ export const URL = {
   GET_TEAM_INVITATIONS: "/team/invite",
   ACCEPT_INVITE: "/team/invite/accept",
   REJECT_INVITE: "/team/invite/reject",
+  GET_TEAM_TRAIN: "/team/train",
+  ADD_TEAM_TRAIN: "/team/train/add",
+  GET_TEAM_ENDS: "/team/ends",
+  ADD_TEAM_END: "/team/end/add",
+  UPDATE_TEAM_END: "/team/end/update",
+  GET_TEAM_PLAYER_TRAINS: "/team/player/trains",
 
   // Notification
   GET_NOTIFICATIONS: "/notifications",

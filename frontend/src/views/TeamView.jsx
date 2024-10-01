@@ -47,7 +47,7 @@ const TeamView = () => {
     }
   };
   const getTeam = async () => {
-    if (!user || !user.team_id) return;
+    if (!user || !user.team_id) return navigate("/");
     const response = await requestGet(URL.GET_TEAM);
     if (response.status === 200) {
       const { team, members } = response.data;
@@ -135,8 +135,8 @@ const TeamView = () => {
   }, []);
 
   useEffect(() => {
-    if (openFindDialog) getTeamInvitations();
-  }, [openFindDialog]);
+    if (openFindDialog && team) getTeamInvitations();
+  }, [openFindDialog, team]);
 
   return (
     <Box sx={{ flex: 1 }}>
@@ -150,7 +150,7 @@ const TeamView = () => {
         }}
       >
         <Typography variant="h5">
-          <Box sx={{ p: 1 }}>팀 관리 {team && `[ ${team.name} ]`}</Box>
+          <Box>팀 관리 {team && `[ ${team.name} ]`}</Box>
         </Typography>
       </Box>
       <Box>
@@ -211,7 +211,15 @@ const TeamView = () => {
                       >
                         <ConstructionIcon />
                       </Button>
-                      <Button variant="contained" sx={{ p: 1 }}>
+                      <Button
+                        variant="contained"
+                        sx={{ p: 1 }}
+                        onClick={() =>
+                          navigate(URL.TEAM_PLAYER_TRAINS, {
+                            state: { player: p },
+                          })
+                        }
+                      >
                         <TimelineIcon />
                       </Button>
                     </Box>

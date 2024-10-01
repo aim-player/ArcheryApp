@@ -33,6 +33,8 @@ const PlayerEquipment = () => {
   const [, setAlert] = useAlert();
 
   const [tab, setTab] = useState(Menu.BOW);
+  const [bowTab, setBowTab] = useState(Types[Menu.BOW][0].type);
+  const [arrowTab, setArrowTab] = useState(Types[Menu.ARROW][0].type);
   const getPlayerEquipment = async () => {
     if (!location.state || !location.state.player_id)
       return setAlert({
@@ -79,18 +81,56 @@ const PlayerEquipment = () => {
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          p: 1,
           fontSize: 12,
+          overflow: "auto",
         }}
       >
-        {tab === Menu.BOW &&
-          Types[Menu.BOW].map((bow, i) => (
-            <Box key={`bow_${i}`}>{bow.name}</Box>
-          ))}
-        {tab === Menu.ARROW &&
-          Types[Menu.ARROW].map((arrow, i) => (
-            <Box key={`bow_${i}`}>{arrow.name}</Box>
-          ))}
+        {tab === Menu.BOW && (
+          <Tabs
+            value={bowTab}
+            onChange={(_, value) => setBowTab(value)}
+            allowScrollButtonsMobile
+            variant="scrollable"
+            scrollButtons={"auto"}
+          >
+            {Types[Menu.BOW].map((bow, i) => (
+              <Tab
+                key={`bow_${i}`}
+                label={bow.name}
+                value={bow.type}
+                sx={{
+                  p: 0,
+                  "&.MuiButtonBase-root": {
+                    border: "1px solid #ddd",
+                  },
+                }}
+              />
+            ))}
+          </Tabs>
+        )}
+        {tab === Menu.ARROW && (
+          <Tabs
+            value={arrowTab}
+            onChange={(_, value) => setArrowTab(value)}
+            variant="scrollable"
+            allowScrollButtonsMobile
+            scrollButtons={"auto"}
+          >
+            {Types[Menu.ARROW].map((arrow, i) => (
+              <Tab
+                key={`bow_${i}`}
+                label={arrow.name}
+                value={arrow.type}
+                sx={{
+                  p: 0,
+                  "&.MuiButtonBase-root": {
+                    border: "1px solid #ddd",
+                  },
+                }}
+              />
+            ))}
+          </Tabs>
+        )}
       </Box>
       <Box sx={{ p: 1 }}>
         <Button fullWidth variant="contained" sx={{ p: 1 }}>

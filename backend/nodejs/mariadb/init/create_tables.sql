@@ -16,6 +16,7 @@ create table if not exists users (
 create table if not exists trains (
   id int primary key auto_increment,
   user_id char(36) not null,
+  team_id char(36),
   distance int default 60,
   arrow_count int default 6,
   end_count int default 6,

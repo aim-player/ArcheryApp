@@ -237,7 +237,6 @@ const View = ({ close }) => {
                   sx={{ width: "100%" }}
                   value={inputs.gender}
                   onChange={(e) => {
-                    console.log("===: ", e.target.value, inputs.gender);
                     setInputs((state) => ({
                       ...state,
                       gender: Number(e.target.value),

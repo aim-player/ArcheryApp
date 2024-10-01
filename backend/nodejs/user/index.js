@@ -2,6 +2,11 @@ const { QUERY } = require("../constants/query");
 const { pool } = require("../mariadb");
 const { v4 } = require("uuid");
 
+const convertScore = (score) => {
+  if (score === "M") return 0;
+  if (score === "X") return 10;
+  return score;
+};
 const updateTrainStats = async ({ conn, user_id, train_id }) => {
   const rows = await conn.query(QUERY.GET_ENDS, [user_id, train_id]);
   if (rows.length > 0) {
@@ -11,7 +16,7 @@ const updateTrainStats = async ({ conn, user_id, train_id }) => {
     rows.forEach((end) => {
       if (end.scores) {
         const scores = JSON.parse(end.scores).filter((score) => !!score);
-        total_score += scores.reduce((a, b) => a + b, 0);
+        total_score += scores.reduce((a, b) => a + convertScore(b), 0);
         total_shot += scores.length;
       }
     });
@@ -219,7 +224,7 @@ const addEnd = async (req, res) => {
     await updateTrainStats({ conn, user_id: id, train_id });
     res.json(rows[0]);
   } catch (err) {
-    console.error("Add Train Error: ", err);
+    console.error("Add End Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -234,7 +239,7 @@ const addPlace = async (req, res) => {
     const rows = await conn.query(QUERY.ADD_PLACE, [id, name]);
     res.json(rows[0]);
   } catch (err) {
-    console.error("Add Train Error: ", err);
+    console.error("Add Place Error: ", err);
     res.sendStatus(500);
   } finally {
     if (conn) conn.release();
@@ -600,6 +605,134 @@ const getNotifications = async (req, res) => {
     if (conn) conn.release();
   }
 };
+const addTeamTrain = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { players, team_id, distance, arrowCount, endCount, place } =
+      req.body;
+
+    const [results] = await Promise.all(
+      players.map(
+        async (player) =>
+          await conn.query(QUERY.ADD_TEAM_TRAIN, [
+            player,
+            team_id,
+            distance,
+            arrowCount,
+            endCount,
+            place,
+          ])
+      )
+    );
+    res.json({ train: results[0] });
+  } catch (err) {
+    console.error("Add Team Train Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const getTeamTrains = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { team_id } = req.userInfo;
+    const rows = await conn.query(QUERY.GET_TEAM_TRAINS, [team_id]);
+
+    return res.json({ trains: rows });
+  } catch (err) {
+    console.error("Get Team Train Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const getTeamTrain = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { team_id, create_time } = req.query;
+    const rows = await conn.query(QUERY.GET_TEAM_TRAIN, [team_id, create_time]);
+
+    return res.json({ players: rows });
+  } catch (err) {
+    console.error("Get Team Train Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const getTeamEnds = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { train_id, player_id } = req.query;
+    const rows = await conn.query(QUERY.GET_ENDS, [player_id, train_id]);
+
+    return res.json({ ends: rows });
+  } catch (err) {
+    console.error("Get Team Ends Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const addTeamEnd = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { train_id, player_id, scores } = req.body;
+    await conn.query(QUERY.ADD_TEAM_END, [
+      player_id,
+      train_id,
+      JSON.stringify(scores),
+    ]);
+    await updateTrainStats({ conn, user_id: player_id, train_id });
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Add Team End Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const updateTeamEnd = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { train_id, player_id, end_id, scores } = req.body;
+
+    await conn.query(QUERY.UPDATE_TEAM_END, [
+      JSON.stringify(scores),
+      end_id,
+      player_id,
+    ]);
+    await updateTrainStats({ conn, user_id: player_id, train_id });
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Update Team End Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const getTeamPlayerTrains = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { player_id } = req.query;
+    const rows = await conn.query(QUERY.GET_TRAINS, [player_id]);
+
+    return res.json({ trains: rows });
+  } catch (err) {
+    console.error("Get Team Player Train Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 module.exports = {
   getUserProfile,
   upateUserName,
@@ -630,4 +763,11 @@ module.exports = {
   acceptTeamInvitation,
   deleteTeamInvitation,
   getNotifications,
+  getTeamTrains,
+  getTeamTrain,
+  addTeamTrain,
+  getTeamEnds,
+  addTeamEnd,
+  updateTeamEnd,
+  getTeamPlayerTrains,
 };

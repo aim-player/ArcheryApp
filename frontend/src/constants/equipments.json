@@ -1,0 +1,104 @@
+{
+  "bow": {
+    "handle": [
+      { "brand": "호이트(HOYE)", "name": "GMX3" },
+      { "brand": "호이트(HOYE)", "name": "포뮬러XD2023" },
+      { "brand": "호이트(HOYE)", "name": "엑시드" },
+      { "brand": "엠케이(MK KOREA)", "name": "MKXG" },
+      { "brand": "엠케이(MK KOREA)", "name": "SD" },
+      { "brand": "엠케이(MK KOREA)", "name": "MK-S" },
+      { "brand": "엠케이(MK KOREA)", "name": "X-ON" },
+      { "brand": "위아위스(WIAWIS)", "name": "MATA-DX" },
+      { "brand": "위아위스(WIAWIS)", "name": "이노 CXT" },
+      { "brand": "위아위스(WIAWIS)", "name": "ATF-DX" },
+      { "brand": "위아위스(WIAWIS)", "name": "윈엑트 VT" },
+      { "brand": "위아위스(WIAWIS)", "name": "ATF-X" },
+      { "brand": "파이빅스(FIVICS)", "name": "스카디" },
+      { "brand": "파이빅스(FIVICS)", "name": "아르곤 X" },
+      { "brand": "파이빅스(FIVICS)", "name": "NX-T" },
+      { "brand": "파이빅스(FIVICS)", "name": "벨라토V2" },
+      { "brand": "파이빅스(FIVICS)", "name": "벨라토V3" },
+      { "brand": "파이빅스(FIVICS)", "name": "제니아" }
+    ],
+    "wing": [
+      { "brand": "호이트(HOYE)", "name": "포뮬러 엑시아" },
+      { "brand": "호이트(HOYE)", "name": "엑시아" },
+      { "brand": "엠케이(MK KOREA)", "name": "X-CORE" },
+      { "brand": "엠케이(MK KOREA)", "name": "XENON" },
+      { "brand": "엠케이(MK KOREA)", "name": "ZEST" },
+      { "brand": "엠케이(MK KOREA)", "name": "CORE" },
+      { "brand": "위아위스(WIAWIS)", "name": "윈엑트VT" },
+      { "brand": "위아위스(WIAWIS)", "name": "EX프라임" },
+      { "brand": "위아위스(WIAWIS)", "name": "NS-XP" },
+      { "brand": "위아위스(WIAWIS)", "name": "MXT-XP" },
+      { "brand": "위아위스(WIAWIS)", "name": "MXT-10" },
+      { "brand": "위아위스(WIAWIS)", "name": "NS-G" },
+      { "brand": "위아위스(WIAWIS)", "name": "NS" },
+      { "brand": "파이빅스(FIVICS)", "name": "스카디" },
+      { "brand": "파이빅스(FIVICS)", "name": "아르곤X" },
+      { "brand": "파이빅스(FIVICS)", "name": "NX" },
+      { "brand": "파이빅스(FIVICS)", "name": "EX" },
+      { "brand": "파이빅스(FIVICS)", "name": "제니아" },
+      { "brand": "파이빅스(FIVICS)", "name": "벨라토" },
+      { "brand": "파이빅스(FIVICS)", "name": "벨라토V3" }
+    ],
+    "sight": [
+      { "brand": "엑셀", "name": "엑셀" },
+      { "brand": "파이빅스(FIVICS)", "name": "FV-300" },
+      { "brand": "시부야(SHIBUYA)", "name": "울티마3" },
+      { "brand": "시부야(SHIBUYA)", "name": "울티마RC프로" },
+      { "brand": "위아위스(WIAWIS)", "name": "VT" },
+      { "brand": "위아위스(WIAWIS)", "name": "WS-600" },
+      { "brand": "위아위스(WIAWIS)", "name": "WS-700" }
+    ],
+    "stabilizer": [
+      { "brand": "파이빅스(FIVICS)", "name": "벨라토르" },
+      { "brand": "파이빅스(FIVICS)", "name": "스카디 BX" },
+      { "brand": "파이빅스(FIVICS)", "name": "포닉스 14 " },
+      { "brand": "엠케이(MK KOREA)", "name": "MK XR" },
+      { "brand": "위아위스(WIAWIS)", "name": "ACS-15EL(CX-AD)" },
+      { "brand": "위아위스(WIAWIS)", "name": "ACS-15EL(S-21)" },
+      { "brand": "위아위스(WIAWIS)", "name": "ACS-15CX-AD" },
+      { "brand": "위아위스(WIAWIS)", "name": "ACS-15(S-21)" },
+      { "brand": "위아위스(WIAWIS)", "name": "S-21" },
+      { "brand": "위아위스(WIAWIS)", "name": "HMC PLUS" },
+      { "brand": "위아위스(WIAWIS)", "name": "SVT" }
+    ],
+    "string": [
+      { "brand": "마제스티", "name": "777" },
+      { "brand": "브로우넬", "name": "FF" }
+    ],
+    "cushion": [
+      { "brand": "파이빅스(FIVICS)", "name": "에어렉스" },
+      { "brand": "파이빅스(FIVICS)", "name": "SM-540" },
+      { "brand": "파이빅스(FIVICS)", "name": "제니아2" },
+      { "brand": "위아위스(WIAWIS)", "name": "ACS" },
+      { "brand": "위아위스(WIAWIS)", "name": "WK-500" },
+      { "brand": "위아위스(WIAWIS)", "name": "VT" },
+      { "brand": "바이타", "name": "바이타" }
+    ]
+  },
+  "arrow": {
+    "shaft": [],
+    "knock": [
+      { "brand": "바이타", "name": "핀노크" },
+      { "brand": "바이타", "name": "아웃노크" },
+      { "brand": "파이빅스(FIVICS)", "name": "인노크" },
+      { "brand": "파이빅스(FIVICS)", "name": "핀노크" },
+      { "brand": "이스턴(EASTON)", "name": "인노크" },
+      { "brand": "이스턴(EASTON)", "name": "핀노크" },
+      { "brand": "위아위스(WIAWIS)", "name": "핀노크" }
+    ],
+    "point": [],
+    "feather": [
+      { "brand": "파이빅스(FIVICS)", "name": "P3" },
+      { "brand": "파이빅스(FIVICS)", "name": "파이빅스" },
+      { "brand": "이스턴(EASTON)", "name": "컴파용" },
+      { "brand": "이스턴(EASTON)", "name": "리커브용" },
+      { "brand": "JET-6", "name": "스핀깃" },
+      { "brand": "렌조메틱", "name": "스핀깃" },
+      { "brand": "FFP", "name": "187" }
+    ],
+    "pin": []
+  }
+}

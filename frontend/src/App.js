@@ -21,6 +21,10 @@ import TrainView from "views/TrainView";
 import TrainsView from "views/TrainsView";
 import SettingView from "views/SettingView";
 import TeamView from "views/TeamView";
+import TeamTrainCreate from "components/master/TeamTrainCreate";
+import TeamTrainView from "views/TeamTrainView";
+import TeamTrainsView from "views/TeamTrainsView";
+import TeamPlayerTrains from "views/TeamPlayerTrains";
 
 dayjs.locale("ko");
 
@@ -131,6 +135,10 @@ function App() {
           <Route path={URL.SETTING} element={<SettingView />} />
           <Route path={URL.TEAM} element={<TeamView />} />
           <Route path={URL.PLAYER_EQUIPMENT} element={<PlayerEquipment />} />
+          <Route path={URL.TEAM_TRAINS} element={<TeamTrainsView />} />
+          <Route path={URL.TEAM_TRAIN} element={<TeamTrainView />} />
+          <Route path={URL.ADD_TEAM_TRAIN} element={<TeamTrainCreate />} />
+          <Route path={URL.TEAM_PLAYER_TRAINS} element={<TeamPlayerTrains />} />
         </Routes>
         <CustomBottomNavigation />
       </Container>

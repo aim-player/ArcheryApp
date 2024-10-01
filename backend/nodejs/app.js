@@ -35,6 +35,13 @@ const {
   getTeamInvitations,
   acceptTeamInvitation,
   deleteTeamInvitation,
+  getTeamTrains,
+  getTeamTrain,
+  addTeamTrain,
+  getTeamEnds,
+  addTeamEnd,
+  updateTeamEnd,
+  getTeamPlayerTrains,
   getNotifications,
 } = require("./user");
 
@@ -101,6 +108,13 @@ app.post("/team/invite", validateSession, inviteTeam);
 app.get("/team/invite", validateSession, getTeamInvitations);
 app.post("/team/invite/accept", validateSession, acceptTeamInvitation);
 app.post("/team/invite/reject", validateSession, deleteTeamInvitation);
+app.get("/team/trains", validateSession, getTeamTrains);
+app.get("/team/train", validateSession, getTeamTrain);
+app.post("/team/train/add", validateSession, addTeamTrain);
+app.get("/team/ends", validateSession, getTeamEnds);
+app.post("/team/end/add", validateSession, addTeamEnd);
+app.post("/team/end/update", validateSession, updateTeamEnd);
+app.get("/team/player/trains", validateSession, getTeamPlayerTrains);
 
 // Notification
 app.get("/notifications", validateSession, getNotifications);
