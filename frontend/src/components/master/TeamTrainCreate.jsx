@@ -10,13 +10,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { requestGet, requestPost } from "utils/fetch";
-import { useUser } from "utils/context";
+import { useAlert, useUser } from "utils/context";
 import { URL } from "constants/url";
 import { ARROW_COUNT, DISTANCE, END_COUNT } from "constants/rule";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PlaceSelector from "components/train/PlaceSelector";
 const TeamTrainCreate = () => {
   const [user] = useUser();
+  const [, setAlert] = useAlert();
   const [team, setTeam] = useState();
   const [openPlaceDialog, setOpenPlaceDialog] = useState(false);
   const [members, setMembers] = useState([]);
@@ -29,7 +30,12 @@ const TeamTrainCreate = () => {
   });
   const navigate = useNavigate();
   const getTeam = async () => {
-    if (!user || !user.team_id) return navigate("/");
+    if (!user || !user.team_id)
+      return setAlert({
+        active: true,
+        message: "팀을 생성해주세요.",
+        callbackFn: () => navigate("/"),
+      });
     const response = await requestGet(URL.GET_TEAM);
     if (response.status === 200) {
       const { team, members } = response.data;

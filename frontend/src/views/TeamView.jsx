@@ -47,7 +47,7 @@ const TeamView = () => {
     }
   };
   const getTeam = async () => {
-    if (!user || !user.team_id) return navigate("/");
+    // if (!user || !user.team_id) return navigate("/");
     const response = await requestGet(URL.GET_TEAM);
     if (response.status === 200) {
       const { team, members } = response.data;
