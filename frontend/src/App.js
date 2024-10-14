@@ -76,17 +76,17 @@ function App() {
     }
   };
   useEffect(() => {
-    const refresh = async () => {
-      const session = await refreshSession();
-      if (session) setUser(session);
-    };
-    refresh();
+    // const refresh = async () => {
+    //   const session = await refreshSession();
+    //   if (session) setUser(session);
+    // };
+    // refresh();
 
-    const loadAppData = () => {
-      if (window.ReactNativeWebView)
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: "load" }));
-    };
-    loadAppData();
+    // const loadAppData = () => {
+    //   if (window.ReactNativeWebView)
+    //     window.ReactNativeWebView.postMessage(JSON.stringify({ type: "load" }));
+    // };
+    // loadAppData();
 
     if (window.platformOS === "ios")
       window.addEventListener("message", onMessage);
