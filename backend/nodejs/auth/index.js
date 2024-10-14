@@ -7,7 +7,10 @@ const { pool } = require("../mariadb");
 const authenticateUser = async (req, res) => {
   const data = req.body;
   const platform = data.platform;
-  if (!platform) return res.status(500).send("PLF Error 1");
+  if (!platform) {
+    res.clearCookie("session");
+    return res.status(500).send("PLF Error 1");
+  }
   let userInfo = null;
 
   switch (platform) {
@@ -22,7 +25,7 @@ const authenticateUser = async (req, res) => {
             platform,
             idToken: data.idToken,
             userInfo,
-            expiry_date: exp * 1000,
+            expiry_date: exp * 1000 + 60 * 60 * 24 * 30 * 3,
           }),
           { httpOnly: true, sameSite: "None", secure: true }
         )
@@ -77,6 +80,8 @@ const refreshSession = async (req, res) => {
 
   req.session = JSON.parse(session);
   req.userInfo = JSON.parse(session).userInfo;
+  if (!req.session || !req.userInfo)
+    return res.clearCookie("session").status(500).send(null);
   const expired = req.session.expiry_date < Date.now();
   if (expired) {
     res.clearCookie("session");

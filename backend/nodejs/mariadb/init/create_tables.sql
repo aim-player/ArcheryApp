@@ -50,6 +50,13 @@ create table if not exists player_profile (
   constraint fk_users_player_profile foreign key (user_id) references users(id) on delete cascade
 );
 
+create table if not exists player_equipment (
+  user_id char(36) primary key not null,
+  bow json,
+  arrow json,
+  constraint fk_users_player_equipment foreign key (user_id) references users(id) on delete cascade
+);
+
 create table if not exists teams (
   team_id char(36) primary key not null,
   owner_id char(36) not null,

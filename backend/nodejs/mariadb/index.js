@@ -7,6 +7,7 @@ const initFilePath = path.join(__dirname + "/init/create_tables.sql");
 const pool = M.createPool({
   host: "mariadb",
   user: "root",
+  database: "archery",
   password: "test",
   connectionLimit: 10,
 });
