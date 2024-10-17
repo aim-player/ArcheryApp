@@ -6,6 +6,7 @@ const QUERY = {
 
   ADD_PLAYER_PROFILE: "insert into player_profile (user_id) values (?)",
   GET_PLAYER_PROFILE: "select * from player_profile where user_id=?",
+  GET_PLAYER_EQUIPMENT: "select * from player_equipment where user_id=?",
   ADD_PROFILE: "update users set role=?, name=? where email=?",
   ADD_SHEET:
     "insert into sheets (user_id, name, date, start_time, end_time, place) values (?, ?, ?, ?, ?, ?) returning *",

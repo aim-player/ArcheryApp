@@ -1,17 +1,32 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControlLabel,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useAlert } from "utils/context";
 import { URL } from "constants/url";
 import { useEffect, useState } from "react";
+// import data from "../../constants/equipments.json";
 
 import CloseIcon from "@mui/icons-material/Close";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import { requestGet, requestPost } from "utils/fetch";
 
 const Menu = {
   BOW: "bow",
   ARROW: "arrow",
 };
 const Types = {
-  [Menu.BOW]: [
+  bow: [
     { name: "핸들", type: "handle" },
     { name: "날개", type: "wing" },
     { name: "조준기", type: "sight" },
@@ -19,7 +34,7 @@ const Types = {
     { name: "쿠션", type: "cushion" },
     { name: "현사", type: "string" },
   ],
-  [Menu.ARROW]: [
+  arrow: [
     { name: "샤프트", type: "shaft" },
     { name: "포인트", type: "point" },
     { name: "노크", type: "knock" },
@@ -31,10 +46,24 @@ const PlayerEquipment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [, setAlert] = useAlert();
+  const [editTarget, setEditTarget] = useState();
+  const [formState, setFormState] = useState({ name: "", brand: "" });
+
+  const [equipments, setEquipments] = useState({
+    bow_handle: { name: "", brand: "" },
+    bow_wing: { name: "", brand: "" },
+    bow_sight: { name: "", brand: "" },
+    bow_stabilizer: { name: "", brand: "" },
+    bow_cushion: { name: "", brand: "" },
+    bow_string: { name: "", brand: "" },
+    arrow_shaft: { name: "", brand: "" },
+    arrow_feather: { name: "", brand: "" },
+    arrow_knock: { name: "", brand: "" },
+    arrow_point: { name: "", brand: "" },
+    arrow_pin: { name: "", brand: "" },
+  });
 
   const [tab, setTab] = useState(Menu.BOW);
-  const [bowTab, setBowTab] = useState(Types[Menu.BOW][0].type);
-  const [arrowTab, setArrowTab] = useState(Types[Menu.ARROW][0].type);
   const getPlayerEquipment = async () => {
     if (!location.state || !location.state.player_id)
       return setAlert({
@@ -46,13 +75,53 @@ const PlayerEquipment = () => {
     const requestOptions = {
       params: { player_id },
     };
-    // const response = await getPlayerEquipment(URL.GET_PLAYER_)
+    const response = await requestGet(URL.GET_PLAYER_EQUIPMENT, requestOptions);
+    if (response.status === 200) {
+      const { equipment } = response.data;
+      if (equipment) {
+        const value = {};
+        for (const part in equipment) {
+          equipment[part] && (value[part] = equipment[part]);
+        }
+        setEquipments((state) => ({ ...state, ...value }));
+      }
+    }
+  };
+  const save = async () => {
+    const requestOptions = {
+      data: {
+        part: `${tab}_${editTarget.type}`,
+        value: JSON.stringify(formState),
+        player_id: location.state.player_id,
+      },
+    };
+    const response = await requestPost(
+      URL.UPDATE_PLAYER_EQUIPMENT,
+      requestOptions
+    );
+    if (response.status === 200) {
+      getPlayerEquipment();
+      setEditTarget(null);
+    }
   };
   useEffect(() => {
     getPlayerEquipment();
   }, []);
+
+  useEffect(() => {
+    if (editTarget) setFormState(equipments[`${tab}_${editTarget.type}`]);
+    else setFormState({ name: "", brand: "" });
+  }, [editTarget]);
+
   return (
-    <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        overflowY: "auto",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -80,63 +149,228 @@ const PlayerEquipment = () => {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          gap: 2,
-          fontSize: 12,
-          overflow: "auto",
+          p: 1,
+          overflowY: "auto",
         }}
       >
         {tab === Menu.BOW && (
-          <Tabs
-            value={bowTab}
-            onChange={(_, value) => setBowTab(value)}
-            allowScrollButtonsMobile
-            variant="scrollable"
-            scrollButtons={"auto"}
-          >
-            {Types[Menu.BOW].map((bow, i) => (
-              <Tab
-                key={`bow_${i}`}
-                label={bow.name}
-                value={bow.type}
+          <>
+            {Types.bow.map((part, i) => (
+              <Box
                 sx={{
-                  p: 0,
-                  "&.MuiButtonBase-root": {
-                    border: "1px solid #ddd",
-                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  borderBottom: "2px solid #eee",
+                  py: 1.5,
                 }}
-              />
+                key={part.type}
+              >
+                <Box sx={{ fontWeight: "bold", width: 120 }}>{part.name}</Box>
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    gap: 1,
+                    overflow: "hidden",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        fontSize: 14,
+                      }}
+                    >
+                      브랜드명: {equipments[`bow_${part.type}`].brand}
+                    </Box>
+                    <Box
+                      sx={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        fontSize: 14,
+                      }}
+                    >
+                      제품명: {equipments[`bow_${part.type}`].name}
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      sx={{ p: 0.5 }}
+                      onClick={() => setEditTarget(part)}
+                    >
+                      <BorderColorIcon />
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
             ))}
-          </Tabs>
+          </>
         )}
         {tab === Menu.ARROW && (
-          <Tabs
-            value={arrowTab}
-            onChange={(_, value) => setArrowTab(value)}
-            variant="scrollable"
-            allowScrollButtonsMobile
-            scrollButtons={"auto"}
-          >
-            {Types[Menu.ARROW].map((arrow, i) => (
-              <Tab
-                key={`bow_${i}`}
-                label={arrow.name}
-                value={arrow.type}
+          <>
+            {Types.arrow.map((part, i) => (
+              <Box
                 sx={{
-                  p: 0,
-                  "&.MuiButtonBase-root": {
-                    border: "1px solid #ddd",
-                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  borderBottom: "2px solid #eee",
+                  py: 1.5,
                 }}
-              />
+                key={part.type}
+              >
+                <Box sx={{ fontWeight: "bold", width: 120 }}>{part.name}</Box>
+                <Box
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    gap: 1,
+                    overflow: "hidden",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      flex: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        fontSize: 14,
+                      }}
+                    >
+                      브랜드명: {equipments[`arrow_${part.type}`].brand}
+                    </Box>
+                    <Box
+                      sx={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        fontSize: 14,
+                      }}
+                    >
+                      제품명: {equipments[`arrow_${part.type}`].name}
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      sx={{ p: 0.5 }}
+                      onClick={() => setEditTarget(part)}
+                    >
+                      <BorderColorIcon />
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
             ))}
-          </Tabs>
+          </>
         )}
       </Box>
-      <Box sx={{ p: 1 }}>
-        <Button fullWidth variant="contained" sx={{ p: 1 }}>
-          저장하기
-        </Button>
-      </Box>
+      {editTarget && (
+        <Dialog
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          fullWidth
+        >
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <Box>{editTarget.name} 설정</Box>
+            <Button
+              variant="contained"
+              sx={{ p: 0.5 }}
+              onClick={() => setEditTarget(null)}
+            >
+              <CloseIcon />
+            </Button>
+          </DialogTitle>
+          <Divider />
+          <DialogContent
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <FormControlLabel
+              labelPlacement="start"
+              label="브랜드명"
+              value={formState.brand}
+              onChange={(e) =>
+                setFormState((state) => ({ ...state, brand: e.target.value }))
+              }
+              control={<TextField />}
+              sx={{
+                display: "flex",
+                gap: 1,
+                width: "100%",
+                justifyContent: "flex-end",
+                "& .MuiInputBase-root ": { p: 1 },
+                "& .MuiFormControl-root": { flex: 1 },
+                "&.MuiFormControlLabel-root": { margin: 0 },
+                "& .MuiFormControlLabel-label": {
+                  width: 60,
+                  fontSize: 14,
+                },
+              }}
+            />
+            <FormControlLabel
+              labelPlacement="start"
+              label="제품명"
+              value={formState.name}
+              onChange={(e) =>
+                setFormState((state) => ({ ...state, name: e.target.value }))
+              }
+              control={<TextField />}
+              sx={{
+                display: "flex",
+                gap: 1,
+                width: "100%",
+                justifyContent: "flex-end",
+                "& .MuiInputBase-root ": { p: 1 },
+                "& .MuiFormControl-root": { flex: 1 },
+                "&.MuiFormControlLabel-root": { margin: 0 },
+                "& .MuiFormControlLabel-label": {
+                  width: 60,
+                  fontSize: 14,
+                },
+              }}
+            />
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ p: 0.5 }}
+              onClick={save}
+            >
+              저장
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 };

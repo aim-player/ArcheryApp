@@ -79,7 +79,16 @@
     ]
   },
   "arrow": {
-    "shaft": [],
+    "shaft": [
+      { "brand": "이스턴(EASTON)", "name": "X10" },
+      { "brand": "이스턴(EASTON)", "name": "프로투어" },
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스" },
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스프로" },
+      { "brand": "파이빅스(FIVICS)", "name": "텐프로" },
+      { "brand": "파이빅스(FIVICS)", "name": "골드로" },
+      { "brand": "파이빅스(FIVICS)", "name": "제일로" },
+      { "brand": "파이빅스(FIVICS)", "name": "FIVE - X" }
+    ],
     "knock": [
       { "brand": "바이타", "name": "핀노크" },
       { "brand": "바이타", "name": "아웃노크" },
@@ -89,7 +98,18 @@
       { "brand": "이스턴(EASTON)", "name": "핀노크" },
       { "brand": "위아위스(WIAWIS)", "name": "핀노크" }
     ],
-    "point": [],
+    "point": [
+      { "brand": "위아위스(WIAWIS)", "name": "X10" },
+      { "brand": "엠케이(MK KOREA)", "name": "X10" },
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스" },
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스프로" },
+      { "brand": "이스턴(EASTON)", "name": "X10" },
+      { "brand": "파이빅스(FIVICS)", "name": "X10" },
+      { "brand": "파이빅스(FIVICS)", "name": "텐프로" },
+      { "brand": "파이빅스(FIVICS)", "name": "골드로" },
+      { "brand": "파이빅스(FIVICS)", "name": "제일로" },
+      { "brand": "파이빅스(FIVICS)", "name": "FIVE - X" }
+    ],
     "feather": [
       { "brand": "파이빅스(FIVICS)", "name": "P3" },
       { "brand": "파이빅스(FIVICS)", "name": "파이빅스" },
@@ -99,6 +119,12 @@
       { "brand": "렌조메틱", "name": "스핀깃" },
       { "brand": "FFP", "name": "187" }
     ],
-    "pin": []
+    "pin": [
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스" },
+      { "brand": "위아위스(WIAWIS)", "name": "아트락스프로" },
+      { "brand": "이스턴(EASTON)", "name": "X10" },
+      { "brand": "파이빅스(FIVICS)", "name": "텐프로" },
+      { "brand": "파이빅스(FIVICS)", "name": "제일로" }
+    ]
   }
 }

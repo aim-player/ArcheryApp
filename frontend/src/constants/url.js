@@ -23,6 +23,8 @@ export const URL = {
   GET_PLAYER_PROFILE: "/player/profile/get",
   UPDATE_PLAYER_PROFILE: "/player/profile/update",
   FIND_PLAYER: "/player/find",
+  GET_PLAYER_EQUIPMENT: "/player/equipment",
+  UPDATE_PLAYER_EQUIPMENT: "/player/equipment/update",
 
   // Sheet
   ADD_SHEET: "/sheet/add",

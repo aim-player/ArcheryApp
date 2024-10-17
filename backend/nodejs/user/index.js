@@ -461,6 +461,40 @@ const findPlayers = async (req, res) => {
     if (conn) conn.release();
   }
 };
+const getPlayerEquipment = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { player_id } = req.query;
+    const rows = await conn.query(QUERY.GET_PLAYER_EQUIPMENT, [player_id]);
+
+    return res.json({ equipment: rows.length > 0 ? rows[0] : null });
+  } catch (err) {
+    console.error("Get Player Equipment Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+const updatePlayerEquipment = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { part, value, player_id } = req.body;
+
+    const query = `INSERT INTO player_equipment (user_id, ${part})
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE ${part} = ?`;
+
+    await conn.query(query, [player_id, value, value]);
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Update Player Equipment Error: ", err);
+    res.sendStatus(500);
+  } finally {
+    if (conn) conn.release();
+  }
+};
 
 const getTeam = async (req, res) => {
   let conn;
@@ -756,6 +790,8 @@ module.exports = {
   getPlayerProfile,
   updatePlayerProfile,
   findPlayers,
+  getPlayerEquipment,
+  updatePlayerEquipment,
   getTeam,
   createTeam,
   inviteTeam,

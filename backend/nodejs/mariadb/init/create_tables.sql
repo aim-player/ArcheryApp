@@ -52,8 +52,18 @@ create table if not exists player_profile (
 
 create table if not exists player_equipment (
   user_id char(36) primary key not null,
-  bow json,
-  arrow json,
+  bow_handle json,
+  bow_wing json,
+  bow_sight json,
+  bow_stabilizer json,
+  bow_string json,
+  bow_cushion json,
+  arrow_shaft json,
+  arrow_feather json,
+  arrow_knock json,
+  arrow_point json,
+  arrow_pin json,
+  memo text,
   constraint fk_users_player_equipment foreign key (user_id) references users(id) on delete cascade
 );
 

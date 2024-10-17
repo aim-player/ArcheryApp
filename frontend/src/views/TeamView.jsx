@@ -295,7 +295,7 @@ const TeamView = () => {
                 />
               </Box>
               <Box>
-                <Typography>인사말</Typography>
+                <Typography>소개</Typography>
                 <TextField
                   fullWidth
                   multiline
