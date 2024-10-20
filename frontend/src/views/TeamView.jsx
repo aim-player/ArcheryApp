@@ -125,7 +125,7 @@ const TeamView = () => {
     const response = await requestGet(URL.GET_TEAM_INVITATIONS, requestOptions);
     if (response.status === 200) {
       const { invitations } = response.data;
-      setInvitations(invitations);
+      invitations&& setInvitations(invitations);
     }
   };
 
