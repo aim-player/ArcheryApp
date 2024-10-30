@@ -3,6 +3,7 @@ import { URL } from "constants/url";
 import { useEffect, useState } from "react";
 import { useAlert, useConfirm } from "utils/context";
 import { requestGet, requestPost } from "utils/fetch";
+import CloseIcon from "@mui/icons-material/Close";
 
 const NotificationView = ({ close }) => {
   const [, setAlert] = useAlert();
@@ -38,9 +39,9 @@ const NotificationView = ({ close }) => {
       elevation={6}
       sx={{
         position: "absolute",
-        top: 16,
-        right: 16,
-        left: 16,
+        top: 0,
+        right: 0,
+        left: 0,
         zIndex: 1,
         display: "flex",
         flexDirection: "column",
@@ -54,12 +55,14 @@ const NotificationView = ({ close }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          p: 1,
+          p: 1.5,
           borderBottom: "1px solid #000",
         }}
       >
         <Box>알림</Box>
-        <Button onClick={close}>닫기</Button>
+        <Button onClick={close}>
+          <CloseIcon />
+        </Button>
       </Box>
       <Box
         sx={{
@@ -70,7 +73,7 @@ const NotificationView = ({ close }) => {
           overflowY: "auto",
         }}
       >
-        {notifications.invitations && (
+        {notifications.invitations && notifications.invitations.length > 0 && (
           <Box sx={{ p: 1 }}>
             <Box sx={{ mb: 1 }}>팀 초대</Box>
             <Divider />

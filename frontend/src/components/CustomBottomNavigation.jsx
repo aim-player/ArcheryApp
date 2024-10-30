@@ -16,7 +16,7 @@ const CustomBottomNavigation = () => {
       showLabels
       value={location.pathname}
       onChange={(e, path) => navigate(path)}
-      sx={{ borderTop: "2px solid #000" }}
+      sx={{ borderTop: "1px solid #eee", "& .Mui-selected": { color: "#000" } }}
     >
       <BottomNavigationAction value={URL.HOME} label="홈" icon={<HomeIcon />} />
       <BottomNavigationAction

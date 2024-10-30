@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useAlert } from "utils/context";
+import { useAlert, useUser } from "utils/context";
 import { URL } from "constants/url";
 import { useEffect, useState } from "react";
 // import data from "../../constants/equipments.json";
@@ -43,6 +43,7 @@ const Types = {
   ],
 };
 const PlayerEquipment = () => {
+  const [user] = useUser();
   const location = useLocation();
   const navigate = useNavigate();
   const [, setAlert] = useAlert();
@@ -131,11 +132,10 @@ const PlayerEquipment = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Typography variant="h5">장비 설정</Typography>
+        <Typography sx={{ fontSize: 18 }}>장비 설정</Typography>
         <Button
-          variant="contained"
           sx={{ p: 1 }}
-          onClick={() => navigate(URL.TEAM)}
+          onClick={() => navigate(user.role === 1 ? URL.HOME : URL.TEAM)}
         >
           <CloseIcon />
         </Button>
@@ -166,7 +166,7 @@ const PlayerEquipment = () => {
                 }}
                 key={part.type}
               >
-                <Box sx={{ fontWeight: "bold", width: 120 }}>{part.name}</Box>
+                <Box sx={{ width: 120 }}>{part.name}</Box>
                 <Box
                   sx={{
                     flex: 1,
@@ -211,7 +211,7 @@ const PlayerEquipment = () => {
                     }}
                   >
                     <Button
-                      variant="contained"
+                      color="inherit"
                       sx={{ p: 0.5 }}
                       onClick={() => setEditTarget(part)}
                     >
