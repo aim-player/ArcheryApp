@@ -8,7 +8,7 @@ import "dayjs/locale/ko";
 import MainView from "./views/MainView";
 import theme from "./utils/theme";
 import "./App.css";
-import { refreshSession, requestLogin } from "utils/fetch";
+import { requestLogin } from "utils/fetch";
 import { URL } from "constants/url";
 
 import ProfileInitializer from "components/login/ProfileInitializer";
@@ -45,7 +45,6 @@ function App() {
     if (!response) return;
     const { userInfo } = response.data;
     setUser(userInfo);
-    sendConsoleLog(userInfo);
   };
   const onMessage = ({ data }) => {
     try {
@@ -65,8 +64,7 @@ function App() {
           window.alert(payload.message);
           break;
         case "login/success":
-          sendConsoleLog("===========");
-          doGoogleLogin(payload);
+          doGoogleLogin(payload.data);
           break;
         default:
           sendConsoleLog("Not Defined Type: " + type);

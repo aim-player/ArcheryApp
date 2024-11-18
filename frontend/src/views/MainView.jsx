@@ -4,7 +4,6 @@ import { Box } from "@mui/material";
 import HomeView from "./HomeView";
 import TrainsView from "./TrainsView";
 import SettingView from "./SettingView";
-import PopupView from "./PopupView";
 
 import { VIEW } from "../constants/state";
 import { useUser } from "utils/context";
@@ -40,7 +39,6 @@ const MainView = () => {
       <Box sx={{ flex: 1, overflowY: "auto" }}>
         {components[value] && components[value]}
       </Box>
-      <PopupView />
     </Box>
   );
 };

@@ -1,6 +1,11 @@
 import { createTheme } from "@mui/material";
 
 const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#333",
+    },
+  },
   components: {
     MuiButton: {
       styleOverrides: {
@@ -30,13 +35,3 @@ const theme = createTheme({
   },
 });
 export default theme;
-
-// mixins?: MixinsOptions;
-// components?: Components<Omit<Theme, 'components'>>;
-// palette?: PaletteOptions;
-// shadows?: Shadows;
-// transitions?: TransitionsOptions;
-// typography?: TypographyOptions | ((palette: Palette) => TypographyOptions);
-// zIndex?: ZIndexOptions;
-// unstable_strictMode?: boolean;
-// unstable_sxConfig?: SxConfig;

@@ -4,6 +4,15 @@ const { v4 } = require("uuid");
 const { QUERY } = require("../constants/query");
 const { pool } = require("../mariadb");
 
+const setCookieSession = (res, sessionData) => {
+  return res.cookie('session', JSON.stringify(sessionData), {
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true,
+    maxAge: 60 * 60 * 24 * 30 * 3 * 1000 // 3개월
+  });
+};
+
 const authenticateUser = async (req, res) => {
   const data = req.body;
   const platform = data.platform;
@@ -18,18 +27,15 @@ const authenticateUser = async (req, res) => {
       userInfo = await getUser(platform, data.user.email);
       if (!userInfo) userInfo = await createUser(platform, data.user.email);
       const { exp } = jwtDecode(data.idToken);
-      res
-        .cookie(
-          "session",
-          JSON.stringify({
-            platform,
-            idToken: data.idToken,
-            userInfo,
-            expiry_date: exp * 1000 + 60 * 60 * 24 * 30 * 3,
-          }),
-          { httpOnly: true, sameSite: "None", secure: true }
-        )
-        .json({ userInfo });
+      
+      const sessionData = {
+        platform,
+        idToken: data.idToken,
+        userInfo,
+        expiry_date: exp * 1000 + 60 * 60 * 24 * 30 * 3,
+      };
+
+      setCookieSession(res, sessionData).json({ userInfo });
       break;
     default:
       res.status(500).send("PLF Error 2");

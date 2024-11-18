@@ -81,7 +81,7 @@ app.get("/player/profile/get", validateSession, getPlayerProfile);
 app.post("/player/profile/update", validateSession, updatePlayerProfile);
 app.post("/player/find", validateSession, findPlayers);
 app.get("/player/equipment", validateSession, getPlayerEquipment);
-app.post('/player/equipment/update', validateSession, updatePlayerEquipment);
+app.post("/player/equipment/update", validateSession, updatePlayerEquipment);
 
 // Sheet
 app.post("/sheet/add", validateSession, addSheet);

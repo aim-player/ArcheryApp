@@ -187,10 +187,10 @@ const TrainLogs = () => {
         </Box>
       )}
       {user && user.role === 2 && (
-        <Box>
+        <Box sx={{ p: 1 }}>
           <Button
             fullWidth
-            variant="contained"
+            variant="outlined"
             sx={{ p: 1, fontWeight: "bold" }}
             onClick={() => navigate(URL.ADD_TEAM_TRAIN)}
           >

@@ -21,6 +21,19 @@ const TrainsView = () => {
       setTrains(trains);
     }
   };
+
+  const groupTrainsByMonth = (trains) => {
+    const grouped = {};
+    trains.forEach((train) => {
+      const monthKey = dayjs(train.create_time).format("YYYY-MM");
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
+      }
+      grouped[monthKey].push(train);
+    });
+    return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
+  };
+
   useEffect(() => {
     if (!user)
       return setAlert({
@@ -50,7 +63,6 @@ const TrainsView = () => {
       >
         <Typography variant="h5">훈련일지</Typography>
         <Button
-          variant="contained"
           sx={{ width: 40, height: 40 }}
           onClick={() => navigate(URL.ADD_TRAIN)}
         >
@@ -67,14 +79,30 @@ const TrainsView = () => {
             overflowY: "auto",
           }}
         >
-          {trains.map((train, index) => (
-            <MenuItem
-              key={`train_${index}`}
-              onClick={() => navigate(URL.TRAIN, { state: { id: train.id } })}
-              sx={{ bgcolor: "#f3f3f3" }}
-            >
-              {dayjs(train.create_time).format("YYYY-MM-DD HH:mm")}
-            </MenuItem>
+          {groupTrainsByMonth(trains).map(([month, monthTrains]) => (
+            <Box key={month}>
+              <Typography
+                sx={{
+                  bgcolor: "#e0e0e0",
+                  px: 2,
+                  py: 1,
+                  fontWeight: "bold",
+                }}
+              >
+                {dayjs(month).format("YYYY년 MM월")}
+              </Typography>
+              {monthTrains.map((train, index) => (
+                <MenuItem
+                  key={`train_${month}_${index}`}
+                  onClick={() =>
+                    navigate(URL.TRAIN, { state: { id: train.id } })
+                  }
+                  sx={{ bgcolor: "#f3f3f3" }}
+                >
+                  {dayjs(train.create_time).format("YYYY-MM-DD HH:mm")}
+                </MenuItem>
+              ))}
+            </Box>
           ))}
         </Box>
       ) : (

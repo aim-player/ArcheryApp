@@ -52,11 +52,7 @@ const TrainCreate = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Button
-          variant="contained"
-          sx={{ p: 1 }}
-          onClick={() => navigate(URL.TRAINS)}
-        >
+        <Button sx={{ p: 1 }} onClick={() => navigate(URL.TRAINS)}>
           <ArrowBackIcon />
         </Button>
         <Typography variant="h5">훈련 추가</Typography>

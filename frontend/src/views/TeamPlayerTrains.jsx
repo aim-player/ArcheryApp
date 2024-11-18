@@ -12,6 +12,7 @@ const TeamPlayerTrains = () => {
   const [player, setPlayer] = useState();
   const [trains, setTrains] = useState([]);
   const [train, setTrain] = useState();
+  const [groupedTrains, setGroupedTrains] = useState({});
   const location = useLocation();
   const getPlayerTrains = async () => {
     const requestOptions = {
@@ -23,6 +24,25 @@ const TeamPlayerTrains = () => {
     );
     if (response.status === 200) {
       const { trains } = response.data;
+      const grouped = trains.reduce((acc, train) => {
+        const monthKey = dayjs(train.create_time).format("YYYY-MM");
+        if (!acc[monthKey]) {
+          acc[monthKey] = {
+            maxScore: train.total_score,
+            minScore: train.total_score,
+          };
+        }
+        acc[monthKey].maxScore = Math.max(
+          acc[monthKey].maxScore,
+          train.total_score
+        );
+        acc[monthKey].minScore = Math.min(
+          acc[monthKey].minScore,
+          train.total_score
+        );
+        return acc;
+      }, {});
+      setGroupedTrains(grouped);
       setTrains(trains);
     }
   };
@@ -52,11 +72,7 @@ const TeamPlayerTrains = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Button
-          variant="contained"
-          sx={{ p: 1 }}
-          onClick={() => navigate(URL.TEAM)}
-        >
+        <Button sx={{ p: 1 }} onClick={() => navigate(URL.TEAM)}>
           <ArrowBackIcon />
         </Button>
         <Typography variant="h5">
@@ -64,25 +80,37 @@ const TeamPlayerTrains = () => {
         </Typography>
       </Box>
       <Box sx={{ flex: 1, overflowY: "auto" }}>
-        {trains.length > 0 && (
+        {Object.keys(groupedTrains).length > 0 && (
           <Box
             sx={{
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              gap: 0.5,
+              gap: 1,
               overflowY: "auto",
             }}
           >
-            {trains.map((train, index) => (
-              <MenuItem
-                key={`train_${index}`}
-                onClick={() => setTrain(train)}
-                sx={{ bgcolor: "#f3f3f3" }}
-              >
-                {dayjs(train.create_time).format("YYYY-MM-DD HH:mm")}
-              </MenuItem>
-            ))}
+            {Object.entries(groupedTrains)
+              .sort((a, b) => b[0].localeCompare(a[0]))
+              .map(([month, data]) => (
+                <Box
+                  key={month}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 0.5,
+                    p: 1,
+                    fontSize: 18,
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <Box sx={{ fontWeight: "bold", fontSize: 20 }}>{month}</Box>
+                  <Box>
+                    [ 최고: {data.maxScore}, 최저: {data.minScore} ]
+                  </Box>
+                </Box>
+              ))}
           </Box>
         )}
       </Box>

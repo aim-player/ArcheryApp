@@ -150,11 +150,7 @@ const TrainView = () => {
       <DialogTitle
         sx={{ display: "flex", justifyContent: "space-between", p: 1 }}
       >
-        <Button
-          variant="contained"
-          sx={{ p: 1 }}
-          onClick={() => navigate(URL.TRAINS)}
-        >
+        <Button sx={{ p: 1 }} onClick={() => navigate(URL.TRAINS)}>
           <ArrowBackIcon />
         </Button>
         <ButtonGroup

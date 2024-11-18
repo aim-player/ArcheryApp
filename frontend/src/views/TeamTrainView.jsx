@@ -87,11 +87,7 @@ const TeamTrainView = () => {
           borderBottom: "2px solid #000",
         }}
       >
-        <Button
-          variant="contained"
-          sx={{ p: 1 }}
-          onClick={() => navigate(URL.TEAM_TRAINS)}
-        >
+        <Button sx={{ p: 1 }} onClick={() => navigate(URL.TEAM_TRAINS)}>
           <ArrowBackIcon />
         </Button>
         <Typography variant="h5">팀 훈련</Typography>

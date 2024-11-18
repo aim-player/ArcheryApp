@@ -16,7 +16,25 @@ const CustomBottomNavigation = () => {
       showLabels
       value={location.pathname}
       onChange={(e, path) => navigate(path)}
-      sx={{ borderTop: "1px solid #eee", "& .Mui-selected": { color: "#000" } }}
+      sx={{
+        borderTop: "1px solid #eee",
+        color: "#000",
+        height: 64,
+        "& .Mui-selected": { color: "#000" },
+        "& .MuiBottomNavigationAction-root": {
+          minHeight: 64,
+          padding: "6px 0",
+          "& .MuiBottomNavigationAction-label": {
+            fontSize: "0.75rem",
+            "&.Mui-selected": {
+              fontSize: "0.75rem",
+            },
+          },
+          "& .MuiSvgIcon-root": {
+            marginBottom: 0.5,
+          },
+        },
+      }}
     >
       <BottomNavigationAction value={URL.HOME} label="홈" icon={<HomeIcon />} />
       <BottomNavigationAction

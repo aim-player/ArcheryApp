@@ -15,6 +15,7 @@ services:
     image: mariadb:latest
     container_name: mariadb
     environment:
+      - MARIADB_DATABASE=archery
       - MARIADB_ROOT_PASSWORD=test
     volumes:
       - archery:/var/lib/mysql
