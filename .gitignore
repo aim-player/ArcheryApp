@@ -17,6 +17,9 @@ frontend/.env.production
 # React Native
 reactnative/2.6.0
 reactnative/ios
-reactnative/android
+# reactnative/android
 reactnative/.env.development
 reactnative/.env.production
+reactnative/android/app/google-services.json
+reactnative/android/gradle.properties
+reactnative/android/app/debug.keystore

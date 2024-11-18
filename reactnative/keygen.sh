@@ -1,1 +1,0 @@
-keytool -genkeypair -v -storetype PKCS12 -keystore android/app/my-release-key.keystore -alias my-key -keyalg RSA -keysize 2048 -validity 10000

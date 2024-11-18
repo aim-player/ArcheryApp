@@ -15,7 +15,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import {useEffect} from 'react';
 import {GOOGLE_CLIENT_ID} from '@env';
-
 export const signOutGoogle = async () => {
   try {
     await GoogleSignin.signOut();
