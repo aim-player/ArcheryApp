@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   nodejs:
     container_name: nodejs
@@ -27,7 +28,9 @@ services:
       retries: 10
     networks:
       - app-network
-
+volumes:
+  archery:
+    external: true
 networks:
   app-network:
     driver: bridge
