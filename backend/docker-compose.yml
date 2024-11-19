@@ -19,6 +19,7 @@ services:
       - MARIADB_ROOT_PASSWORD=test
     volumes:
       - archery:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     healthcheck:
