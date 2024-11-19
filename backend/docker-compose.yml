@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   nodejs:
     container_name: nodejs
@@ -22,16 +21,13 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test:
-        ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-ptest"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -ptest"]
+      timeout: 1s
+      interval: 3s
+      retries: 10
     networks:
       - app-network
-volumes:
-  archery:
-    external: true
+
 networks:
   app-network:
     driver: bridge
