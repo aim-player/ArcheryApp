@@ -1,3 +1,7 @@
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'test' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
 create database if not exists archery;
 
 use archery;
